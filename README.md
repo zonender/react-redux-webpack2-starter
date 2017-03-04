@@ -367,7 +367,7 @@ nsp check
 >
 > **_\\==============================================================//_**
 
-01. ) Express is already installed in our project as it is one of the many packages included in the package.json file, to install it as a dev dependency run this command:
+01. ) Express is already installed in our project as a dev dependency in our package.json, but just incase you need to install it, run this command:
 
   ```
   npm install express --save-dev
@@ -414,7 +414,7 @@ nsp check
   });
   ```
 
-  now to run this file run this from the command line:
+  now to run this file with the express server, run this command:
 
   ```
   node buildScripts/srcServer.js
