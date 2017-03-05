@@ -422,6 +422,432 @@ nsp check
 
   Express will open the browser with the page we just created, now we know we configured express correctly since it is listening to and serving our requests.
 
+  Just in case you ever need to open the index.html without a server, run this command:
+
+  ```
+  start src/index.html
+  ```
+
+  The page will open in your browser without the server.
+
+> **_//==============================================================\\_**
+>
+> **_SETTING UP BABEL (USING ES6)_**
+>
+> **_\\==============================================================//_**
+
+In order to use ES6 we will need to configure Babel, it is already included in our package.json, to configure Babel:
+
+01. ) Create a file called: .babelrc with the following code:
+
+```
+{
+  "presets": ["react", "es2015"],
+  "env": {
+    "development": {
+      "presets": ["react-hmre"]
+    }
+  }
+}
+```
+
+01. ) To run our app this time we will need to slightly change our command, instead of the key word "node", we will use "babel-node" as follows:
+
+```
+babel-node buildScripts/srcServer.js
+```
+
+> **_//==============================================================\\_**
+>
+> **_SETTING UP WEBPACK AS A DEVELOPMENT SERVER_**
+>
+> **_\\==============================================================//_**
+
+01. ) Create a webpack.config.dev.js file with the following code:
+
+This is the absolute minimum to run webpack.
+
+```
+import webpack from 'webpack';
+import path from 'path'
+
+export default {
+  entry: './src/index.js',
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: 'bundle.js'
+  }
+};
+```
+
+path makes sure we get the path we need regardless of the OS it is running on.
+
+__dirname is the current directory. (where webpack.config.dev.js is located)
+
+entry: "./src/index.js" is the top level file we want to include in our build.
+
+filename: "bundle.js" is the output file that has includes all out JS code.
+
+installing webpack or any other library globally will force your pc to look for the global installation of node_modules under your username folder in your pc, which could include a large number of modules and libraries, this might be slightly slower, it is best to install it locally using "npm install --save-dev" so that next time you run the command npm will look only in our locally installed node_modules, this is faster.
+
+
+
+> **_//==============================================================\\_**
+>
+> **_CREATING A BASIC APP_**
+>
+> **_\\==============================================================//_**
+
+01. ) Create an index.js file with the following code and save it under src:
+
+  ```
+  import talk from './talktoconsole';
+  console.log(talk(1, 2));
+
+  const button = document.createElement('button');
+  button.innerText = 'Click me';
+  button.onclick = () => {
+      System.import('./image_viewer').then(module => {
+          module.default();
+      });
+  };
+
+  document.body.appendChild(button);
+  ```
+
+01. ) Create the file talkToConsole.js with the following code:
+  
+  ```
+  import numeral from 'numeral';
+
+  const talk = (a, b) =>numeral(a + b).format('$0.0.00');
+
+  export default talk;
+  ```
+01. ) Create the file image_viewer.js with the following code:
+
+  ```
+  import small from '../assets/small.jpg';
+  import big from '../assets/big.jpg';
+  import './styles/image_viewer.css';
+
+  export default () => {
+
+      const smallImageDescription = document.createElement('p');
+      smallImageDescription.innerText = 'This is a small Image that was small enough to be bundled into bundle.js';
+      document.body.appendChild(smallImageDescription);
+
+      const smallImage = document.createElement('img');
+      smallImage.src = small;
+      document.body.appendChild(smallImage);
+
+      const bigImageDescription = document.createElement('p');
+      bigImageDescription.innerText = 'This is a big Image, because it is large it was not bundled in bundle.js';
+      document.body.appendChild(bigImageDescription);
+
+      const bigImage = document.createElement('img');
+      bigImage.src = big;
+      document.body.appendChild(bigImage);
+
+      const randomImageDescription = document.createElement('p');
+      randomImageDescription.innerText = 'This is a random image generated from http://lorempixel.com/';
+      document.body.appendChild(randomImageDescription);
+
+      const randomImage = document.createElement('img');
+      randomImage.src = 'http://lorempixel.com/400/200/';
+      document.body.appendChild(randomImage);
+  };
+  ```
+
+01. ) Create a styles folder in the src folder, within the styles folder create a css file called style.css with the following css code:
+
+```
+img {
+    border: 10px solid red;
+}
+```
+01. ) Create an asstes folder in the root directory and save the following images into them:
+
+http://lorempixel.com/200/200/ - call this small.jpg
+
+http://lorempixel.com/1200/1200/ - call this big.jpg
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+> **_//==============================================================\\_**
+>
+> **_SETTING UP WEBPACK FOR BUNDLING_**
+>
+> **_\\==============================================================//_**
+
+01. ) Before we configure webpack, we will have to create an app that does something simple for demonstration purposes, to do this
+ we will create a simple app that has several js files that webpack will bundle together into a single file called bundle.js, webpack will also bundle any css,
+ and images into the bundle.js file, then webpack will inject this file in the index.html file, so now let's prepare things for webpack before we start using it.
+
+01. ) We already have an index.html file, so let us add the following js files:
+
+  01. ) Create an index.js file with the following code and save it under src:
+
+    ```
+    import talk from './talktoconsole';
+    console.log(talk(1, 2));
+
+    const button = document.createElement('button');
+    button.innerText = 'Click me';
+    button.onclick = () => {
+        System.import('./image_viewer').then(module => {
+            module.default();
+        });
+    };
+
+    document.body.appendChild(button);
+    ```
+
+  01. ) Create the file talkToConsole.js with the following code:
+    
+    ```
+    import numeral from 'numeral';
+
+    const talk = (a, b) =>numeral(a + b).format('$0.0.00');
+
+    export default talk;
+    ```
+  01. ) Create the file image_viewer.js with the following code:
+  
+    ```
+    import small from '../assets/small.jpg';
+    import big from '../assets/big.jpg';
+    import './styles/image_viewer.css';
+
+    export default () => {
+
+        const smallImageDescription = document.createElement('p');
+        smallImageDescription.innerText = 'This is a small Image that was small enough to be bundled into bundle.js';
+        document.body.appendChild(smallImageDescription);
+
+        const smallImage = document.createElement('img');
+        smallImage.src = small;
+        document.body.appendChild(smallImage);
+
+        const bigImageDescription = document.createElement('p');
+        bigImageDescription.innerText = 'This is a big Image, because it is large it was not bundled in bundle.js';
+        document.body.appendChild(bigImageDescription);
+
+        const bigImage = document.createElement('img');
+        bigImage.src = big;
+        document.body.appendChild(bigImage);
+
+        const randomImageDescription = document.createElement('p');
+        randomImageDescription.innerText = 'This is a random image generated from http://lorempixel.com/';
+        document.body.appendChild(randomImageDescription);
+
+        const randomImage = document.createElement('img');
+        randomImage.src = 'http://lorempixel.com/400/200/';
+        document.body.appendChild(randomImage);
+    };
+    ```
+
+  01. ) Create a styles folder in the src folder, within the styles folder create a css file called style.css with the following css code:
+
+  ```
+  img {
+      border: 10px solid red;
+  }
+  ```
+  01. ) Create an asstes folder in the root directory and save the following images into them:
+
+  http://lorempixel.com/200/200/ - call this small.jpg
+
+  http://lorempixel.com/1200/1200/ - call this big.jpg
+
+01. ) Now that we have a working app, we can now configure webpack, we also installed it when we first ran npm install, so now we just have to configure it, we will first have to create
+  the file: webpack.config.js and add the following code to it:
+
+  For more on the configuration of webpack 2: https://github.com/webpack/docs/wiki/configuration
+  For more on webpack's cli commands: https://webpack.github.io/docs/cli.html
+
+  ```
+  const webpack = require('webpack');
+  const path = require('path');
+  const htmlWebpackPlugin = require('html-webpack-plugin');
+
+  //our app third party dependencies
+  const VENDOR_LIBS = [
+    'faker', 'lodash', 'react', 'react-dom', 'react-input-range', 'react-redux',
+    'react-router', 'redux', 'redux-form', 'redux-thunk', 'whatwg-fetch'
+  ];
+
+  const config = {
+    //The entry point for the bundle.
+    entry: {
+      bundle: path.resolve(__dirname, 'src/index'),
+      vendor: VENDOR_LIBS
+    },
+    output: {
+      path: path.join(__dirname, 'build'),
+      publicPath: '/',
+      filename: '[name][chunkhash].js'
+    },
+    module: {
+      rules: [
+        {
+          use: 'babel-loader', //here we are selecting the loader
+          test: /\.js$/, //and here we specify which file the loader will process
+          exclude: /node_modules/
+        },
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader'],
+        },
+        {
+          test: /\.(jpe?g|png|gif|svg)$/,
+          use: [
+            {
+              loader: 'url-loader',
+              options: { limit: 40000 }
+            },
+            'image-webpack-loader'
+          ]
+        }
+      ]
+    },
+    plugins: [
+        //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
+        new webpack.optimize.CommonsChunkPlugin({
+              names: ['vendor', 'manifest']
+        }),
+        //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
+        new htmlWebpackPlugin({
+              template: 'src/index.html' //if we do not specifiy a template, it will use the default one
+        }),
+        //when reactjs runs it looks for this window scoped variable called process.env.NODE_ENV,
+        //if the value of this varaible is production react will not do too many error checking procedures,
+        //which also takes too long to run.
+        new webpack.DefinePlugin({
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        }),
+        new webpack.LoaderOptionsPlugin({
+          options: {
+              noInfo: false,
+              debug: true,
+              devtool: 'inline-source-map',
+              target: 'web',
+          }
+        })
+    ]
+  };
+
+  module.exports = config;
+  ```
+
+With this configuration we can also use webpack as our dev server, to run the project using webpack dev server run this command:
+
+```
+webpack-dev-server
+```
+
+We can also still run our app through express using the command:
+
+```
+babel-node buildScripts/srcServer.js
+```
+
+01. ) Now we can modify our npm scripts to accomoodate the new functionality we have added:
+
+```
+{
+  "name": "setting-up-javascript-react-development-environment",
+  "version": "1.0.0",
+  "description": "Setting up a React development environment with webpack",
+  "scripts": {
+    "prestart": "babel-node buildScripts/startMessage.js",
+    "start": "npm-run-all --parallel security-check open:src",
+    "open:src": "babel-node buildScripts/srcServer.js",
+    "security-check": "nsp check",
+    "localtunnel": "lt --port 3000",
+    "share": "npm-run-all --parallel open:src localtunnel",
+    "clean": "rimraf build",
+    "serve": "webpack-dev-server"
+  },
+  "author": "Asim Abdelgadir",
+  "license": "MIT",
+  "dependencies": {
+    "whatwg-fetch": "1.0.0",
+    "faker": "^3.1.0",
+    "lodash": "^4.17.2",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
+    "react-input-range": "^0.9.2",
+    "react-redux": "^4.4.6",
+    "react-router": "^3.0.0",
+    "redux": "^3.6.0",
+    "redux-form": "^6.3.2",
+    "redux-thunk": "^2.1.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-latest": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-register": "^6.16.3",
+    "chai": "3.5.0",
+    "chalk": "1.1.3",
+    "cheerio": "0.22.0",
+    "compression": "1.6.2",
+    "cross-env": "3.1.3",
+    "css-loader": "^0.26.1",
+    "eslint": "3.8.1",
+    "eslint-plugin-import": "2.0.1",
+    "eslint-watch": "2.1.14",
+    "express": "4.14.0",
+    "extract-text-webpack-plugin": "1.0.1",
+    "html-webpack-plugin": "^2.28.0",
+    "image-webpack-loader": "^3.2.0",
+    "jsdom": "9.8.0",
+    "json-schema-faker": "0.3.6",
+    "json-server": "0.8.22",
+    "localtunnel": "1.8.1",
+    "mocha": "3.1.2",
+    "nock": "8.1.0",
+    "npm-run-all": "3.1.1",
+    "nsp": "2.6.2",
+    "numeral": "1.5.3",
+    "open": "0.0.5",
+    "rimraf": "2.5.4",
+    "style-loader": "0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "2.2.0-rc.0",
+    "webpack-dev-middleware": "1.8.4",
+    "webpack-dev-server": "^2.3.0",
+    "webpack-hot-middleware": "2.13.0",
+    "webpack-md5-hash": "0.0.5"
+  }
+}
+```
+
 > **_//==============================================================\\_**
 >
 > **_SHARING OUR WORK IN PROGRESS WITH LOCALTUNNEL_**
@@ -889,256 +1315,6 @@ To configure babel:
   }
   ```
 
-> **_//==============================================================\\_**
->
-> **_WEBPACK - BUNDLING_**
->
-> **_\\==============================================================//_**
 
-01. ) Before we configure webpack, we will have to create an app that does something simple for demonstration purposes, to do this
- we will create a simple app that has several js files that webpack will bundle together into a single file called bundle.js, webpack will also bundle any css,
- and images into the bundle.js file, then webpack will inject this file in the index.html file, so now let's prepare things for webpack before we start using it.
-
-01. ) We already have an index.html file, so let us add the following js files:
-
-  01. ) Create an index.js file with the following code and save it under src:
-
-    ```
-    import talk from './talktoconsole';
-    console.log(talk(1, 2));
-
-    const button = document.createElement('button');
-    button.innerText = 'Click me';
-    button.onclick = () => {
-        System.import('./image_viewer').then(module => {
-            module.default();
-        });
-    };
-
-    document.body.appendChild(button);
-    ```
-
-  01. ) Create the file talkToConsole.js with the following code:
-    
-    ```
-    import numeral from 'numeral';
-
-    const talk = (a, b) =>numeral(a + b).format('$0.0.00');
-
-    export default talk;
-    ```
-  01. ) Create the file image_viewer.js with the following code:
-  
-    ```
-    import small from '../assets/small.jpg';
-    import big from '../assets/big.jpg';
-    import './styles/image_viewer.css';
-
-    export default () => {
-
-        const smallImageDescription = document.createElement('p');
-        smallImageDescription.innerText = 'This is a small Image that was small enough to be bundled into bundle.js';
-        document.body.appendChild(smallImageDescription);
-
-        const smallImage = document.createElement('img');
-        smallImage.src = small;
-        document.body.appendChild(smallImage);
-
-        const bigImageDescription = document.createElement('p');
-        bigImageDescription.innerText = 'This is a big Image, because it is large it was not bundled in bundle.js';
-        document.body.appendChild(bigImageDescription);
-
-        const bigImage = document.createElement('img');
-        bigImage.src = big;
-        document.body.appendChild(bigImage);
-
-        const randomImageDescription = document.createElement('p');
-        randomImageDescription.innerText = 'This is a random image generated from http://lorempixel.com/';
-        document.body.appendChild(randomImageDescription);
-
-        const randomImage = document.createElement('img');
-        randomImage.src = 'http://lorempixel.com/400/200/';
-        document.body.appendChild(randomImage);
-    };
-    ```
-
-  01. ) Create a styles folder in the src folder, within the styles folder create a css file called style.css with the following css code:
-
-  ```
-  img {
-      border: 10px solid red;
-  }
-  ```
-  01. ) Create an asstes folder in the root directory and save the following images into them:
-
-  http://lorempixel.com/200/200/ - call this small.jpg
-
-  http://lorempixel.com/1200/1200/ - call this big.jpg
-
-01. ) Now that we have a working app, we can now configure webpack, we also installed it when we first ran npm install, so now we just have to configure it, we will first have to create
-  the file: webpack.config.js and add the following code to it:
-
-  For more on the configuration of webpack 2: https://github.com/webpack/docs/wiki/configuration
-  For more on webpack's cli commands: https://webpack.github.io/docs/cli.html
-
-  ```
-  const webpack = require('webpack');
-  const path = require('path');
-  const htmlWebpackPlugin = require('html-webpack-plugin');
-
-  //our app third party dependencies
-  const VENDOR_LIBS = [
-    'faker', 'lodash', 'react', 'react-dom', 'react-input-range', 'react-redux',
-    'react-router', 'redux', 'redux-form', 'redux-thunk', 'whatwg-fetch'
-  ];
-
-  const config = {
-    //The entry point for the bundle.
-    entry: {
-      bundle: path.resolve(__dirname, 'src/index'),
-      vendor: VENDOR_LIBS
-    },
-    output: {
-      path: path.join(__dirname, 'build'),
-      publicPath: '/',
-      filename: '[name][chunkhash].js'
-    },
-    module: {
-      rules: [
-        {
-          use: 'babel-loader', //here we are selecting the loader
-          test: /\.js$/, //and here we specify which file the loader will process
-          exclude: /node_modules/
-        },
-        {
-          test: /\.css$/,
-          use: ['style-loader', 'css-loader'],
-        },
-        {
-          test: /\.(jpe?g|png|gif|svg)$/,
-          use: [
-            {
-              loader: 'url-loader',
-              options: { limit: 40000 }
-            },
-            'image-webpack-loader'
-          ]
-        }
-      ]
-    },
-    plugins: [
-        //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
-        new webpack.optimize.CommonsChunkPlugin({
-              names: ['vendor', 'manifest']
-        }),
-        //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
-        new htmlWebpackPlugin({
-              template: 'src/index.html' //if we do not specifiy a template, it will use the default one
-        }),
-        //when reactjs runs it looks for this window scoped variable called process.env.NODE_ENV,
-        //if the value of this varaible is production react will not do too many error checking procedures,
-        //which also takes too long to run.
-        new webpack.DefinePlugin({
-          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-        }),
-        new webpack.LoaderOptionsPlugin({
-          options: {
-              noInfo: false,
-              debug: true,
-              devtool: 'inline-source-map',
-              target: 'web',
-          }
-        })
-    ]
-  };
-
-  module.exports = config;
-  ```
-
-With this configuration we can also use webpack as our dev server, to run the project using webpack dev server run this command:
-
-```
-webpack-dev-server
-```
-
-We can also still run our app through express using the command:
-
-```
-babel-node buildScripts/srcServer.js
-```
-
-01. ) Now we can modify our npm scripts to accomoodate the new functionality we have added:
-
-```
-{
-  "name": "setting-up-javascript-react-development-environment",
-  "version": "1.0.0",
-  "description": "Setting up a React development environment with webpack",
-  "scripts": {
-    "prestart": "babel-node buildScripts/startMessage.js",
-    "start": "npm-run-all --parallel security-check open:src",
-    "open:src": "babel-node buildScripts/srcServer.js",
-    "security-check": "nsp check",
-    "localtunnel": "lt --port 3000",
-    "share": "npm-run-all --parallel open:src localtunnel",
-    "clean": "rimraf build",
-    "serve": "webpack-dev-server"
-  },
-  "author": "Asim Abdelgadir",
-  "license": "MIT",
-  "dependencies": {
-    "whatwg-fetch": "1.0.0",
-    "faker": "^3.1.0",
-    "lodash": "^4.17.2",
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
-    "react-input-range": "^0.9.2",
-    "react-redux": "^4.4.6",
-    "react-router": "^3.0.0",
-    "redux": "^3.6.0",
-    "redux-form": "^6.3.2",
-    "redux-thunk": "^2.1.0"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.23.0",
-    "babel-core": "^6.17.0",
-    "babel-loader": "^6.2.5",
-    "babel-preset-latest": "^6.16.0",
-    "babel-preset-react": "^6.16.0",
-    "babel-register": "^6.16.3",
-    "chai": "3.5.0",
-    "chalk": "1.1.3",
-    "cheerio": "0.22.0",
-    "compression": "1.6.2",
-    "cross-env": "3.1.3",
-    "css-loader": "^0.26.1",
-    "eslint": "3.8.1",
-    "eslint-plugin-import": "2.0.1",
-    "eslint-watch": "2.1.14",
-    "express": "4.14.0",
-    "extract-text-webpack-plugin": "1.0.1",
-    "html-webpack-plugin": "^2.28.0",
-    "image-webpack-loader": "^3.2.0",
-    "jsdom": "9.8.0",
-    "json-schema-faker": "0.3.6",
-    "json-server": "0.8.22",
-    "localtunnel": "1.8.1",
-    "mocha": "3.1.2",
-    "nock": "8.1.0",
-    "npm-run-all": "3.1.1",
-    "nsp": "2.6.2",
-    "numeral": "1.5.3",
-    "open": "0.0.5",
-    "rimraf": "2.5.4",
-    "style-loader": "0.13.1",
-    "url-loader": "^0.5.7",
-    "webpack": "2.2.0-rc.0",
-    "webpack-dev-middleware": "1.8.4",
-    "webpack-dev-server": "^2.3.0",
-    "webpack-hot-middleware": "2.13.0",
-    "webpack-md5-hash": "0.0.5"
-  }
-}
-```
   
 
