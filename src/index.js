@@ -1,4 +1,5 @@
-import talk from './talktoconsole';
+/* global System */ //this is for eslint to allow the use of System.import
+import talk from './talkToConsole';
 console.log(talk(1, 2));
 
 const button = document.createElement('button');

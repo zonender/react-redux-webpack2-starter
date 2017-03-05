@@ -120,35 +120,6 @@ To make sure everyone inn your team, if you are working with a team, is using th
 
 01. ) Go to <www.editorconfig.org> to download and install your editor's plugin, now your editor will enforce the setting in the .editorconfig, 
 don't forget to enable the plugin after you installed it. 
----
-# SETTINGUP A JAVASCRIPT DEVELOPMENT ENVIRONMENT
----
-
-* Start Date: 04 Mar 2017 
-
-* This markdown file was written based on the guidlines [here](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
-
-* You can also use: <https://stackedit.io> to create a .md file in a WYSIWYG fashion.
-
-* git repo: https://github.com/zonender/react-redux-weback2-starter
-
-* Author: [Asim Abdelgadir](https://github.com/zonender)
-
-* OS: Windows 10 (64-bit)
-
-* Browser: Chrome Version 56.0.2924.87 (64-bit)
-
-* Editor: Visual Studio Code version 1.10.1
-
-* VS CODE File Icon theme: Go to the plugins side menu: type: vscode-icons, locate the plugin, install it, reload, then goto File > Preferences > select "File Icon Theme".
-
-* Node version: 7.5.0
-
-* npm version: 4.2.0
-
-* Command language (SHELL): Git Bash version: 2.11.1 (64-bit)
-
-* Version control: Git version: 2.11.1 (64-bit) and <www.github.com>
 
 > **_//==============================================================\\_**
 >
@@ -603,213 +574,214 @@ babel-node buildScripts/srcServer.js
 
 We are supposed to see a button labeled "Click me", it will not show up, and if you use the "inspect element" tool and open the console, you will see the error message:
 
-Uncaught SyntaxError: Unexpected token import      index.js:1
-Uncaught SyntaxError: Unexpected token import      image_viewer.js:1
-Uncaught SyntaxError: Unexpected token import      talkToConsole.js:1
+  - Uncaught SyntaxError: Unexpected token import      index.js:1
+  - Uncaught SyntaxError: Unexpected token import      image_viewer.js:1
+  - Uncaught SyntaxError: Unexpected token import      talkToConsole.js:1
 
 This is because the browser is unable to interpret the ES6 "import" statement in the first line of each file, to solve this we will need to install webpack to compile the code and 
 bundle it in a single file and in plain JS so that the broweser can understand it and eventually display our button along with its functionality.
 
-> **_//==============================================================================\\_**
+> **_//=========================================================================\\_**
 >
 > **_SETTING UP WEBPACK AS A DEVELOPMENT SERVER AND COMPILING AND BUNDLING OUR CODE_**
 >
-> **_\\==============================================================================//_**
+> **_\\=========================================================================//_**
 
 Now that we have a working app, we can now configure webpack.
 
-  For more on the configuration of webpack 2: https://github.com/webpack/docs/wiki/configuration
-  For more on webpack's cli commands: https://webpack.github.io/docs/cli.html
+  - For more on the configuration of webpack 2: https://github.com/webpack/docs/wiki/configuration
+  - For more on webpack's cli commands: https://webpack.github.io/docs/cli.html
 
 01. ) Create a webpack.config.dev.js file in our root with the following code:
 
-```
-const webpack = require('webpack');
-const path = require('path');
-const htmlWebpackPlugin = require('html-webpack-plugin');
+    ```
+    const webpack = require('webpack');
+    const path = require('path');
+    const htmlWebpackPlugin = require('html-webpack-plugin');
 
-//our app third party dependencies
-const VENDOR_LIBS = [
-  'babel-polyfill', 'bootstrap', 'jquery', 'numeral', 'react', 'react-dom', 'react-redux',
-  'react-router', 'react-router-redux', 'redux', 'redux-thunk', 'toastr'
-];
+    //our app third party dependencies
+    const VENDOR_LIBS = [
+      'babel-polyfill', 'bootstrap', 'jquery', 'numeral', 'react', 'react-dom', 'react-redux',
+      'react-router', 'react-router-redux', 'redux', 'redux-thunk', 'toastr'
+    ];
 
-const config = {
-  //The entry point for the bundle.
-  entry: {
-    bundle: path.resolve(__dirname, 'src/index'),
-    vendor: VENDOR_LIBS
-  },
-  output: {
-    path: path.join(__dirname, 'build'),
-    publicPath: '/',
-    filename: '[name][chunkhash].js'
-  },
-  module: {
-    rules: [
-      {
-        use: 'babel-loader', //here we are selecting the loader
-        test: /\.js$/, //and here we specify which file the loader will process
-        exclude: /node_modules/
+    const config = {
+      //The entry point for the bundle.
+      entry: {
+        bundle: path.resolve(__dirname, 'src/index'),
+        vendor: VENDOR_LIBS
       },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+      output: {
+        path: path.join(__dirname, 'build'),
+        publicPath: '/',
+        filename: '[name][chunkhash].js'
       },
-      {
-        test: /\.(jpe?g|jpg|png|gif|svg)$/,
-        use: [
+      module: {
+        rules: [
           {
-            loader: 'url-loader',
-            options: { limit: 40000 }
+            use: 'babel-loader', //here we are selecting the loader
+            test: /\.js$/, //and here we specify which file the loader will process
+            exclude: /node_modules/
           },
-          'image-webpack-loader'
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader'],
+          },
+          {
+            test: /\.(jpe?g|jpg|png|gif|svg)$/,
+            use: [
+              {
+                loader: 'url-loader',
+                options: { limit: 40000 }
+              },
+              'image-webpack-loader'
+            ]
+          }
         ]
-      }
-    ]
-  },
-  plugins: [
-      //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
-      new webpack.optimize.CommonsChunkPlugin({
-            names: ['vendor', 'manifest']
-      }),
-      //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
-      new htmlWebpackPlugin({
-            template: 'src/index.html' //if we do not specifiy a template, it will use the default one
-      }),
-      //when reactjs runs it looks for this window scoped variable called process.env.NODE_ENV,
-      //if the value of this varaible is production react will not do too many error checking procedures,
-      //which also takes too long to run.
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-      }),
-      new webpack.LoaderOptionsPlugin({
-        options: {
-            noInfo: false,
-            debug: true,
-            devtool: 'inline-source-map',
-            target: 'web',
-        }
-      })
-  ]
-};
+      },
+      plugins: [
+          //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there 
+          //are it will remove them from bundle.js and put them in vendor.js
+          new webpack.optimize.CommonsChunkPlugin({
+                names: ['vendor', 'manifest']
+          }),
+          //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
+          new htmlWebpackPlugin({
+                template: 'src/index.html' //if we do not specifiy a template, it will use the default one
+          }),
+          //when reactjs runs it looks for this window scoped variable called process.env.NODE_ENV,
+          //if the value of this varaible is production react will not do too many error checking procedures,
+          //which also takes too long to run.
+          new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+          }),
+          new webpack.LoaderOptionsPlugin({
+            options: {
+                noInfo: false,
+                debug: true,
+                devtool: 'inline-source-map',
+                target: 'web',
+            }
+          })
+      ]
+    };
 
-module.exports = config;
-```
+    module.exports = config;
+    ```
 
-- path makes sure we get the path we need regardless of the OS it is running on.
+    - path makes sure we get the path we need regardless of the OS it is running on.
 
-- __dirname is the current directory. (where webpack.config.dev.js is located)
+    - __dirname is the current directory. (where webpack.config.dev.js is located)
 
-- entry: "./src/index.js" is the top level file we want to include in our build.
+    - entry: "./src/index.js" is the top level file we want to include in our build.
 
-- filename: "bundle.js" is the output file that has includes all out JS code.
+    - filename: "bundle.js" is the output file that has includes all out JS code.
 
-Please note that webpack will not physically create a bundle.js file in our directory when we later run "webpack-dev-server", rather it will create everything 
-in memory, the physical file bundle.js and any other required file will be created later when we compile our code using the "webpack" command.
+    Please note that webpack will not physically create a bundle.js file in our directory when we later run "webpack-dev-server", rather it will create everything 
+    in memory, the physical file bundle.js and any other required file will be created later when we compile our code using the "webpack" command.
 
-Webpack will bundle together all our js files into a single file called bundle.js, webpack will also bundle any css,
- and images into the bundle.js file, then webpack will inject this file in the index.html file, so now let's prepare things for webpack before we start using it.
+    Webpack will bundle together all our js files into a single file called bundle.js, webpack will also bundle any css,
+    and images into the bundle.js file, then webpack will inject this file in the index.html file, so now let's prepare things for webpack before we start using it.
 
-Webpack will also split our code to improve loaiding performance.
+    Webpack will also split our code to improve loaiding performance.
 
-installing webpack or any other library globally will force your pc to look for the global installation of node_modules under your username folder in your pc, which could include a large number of modules and libraries, this might be slightly slower, it is best to install it locally using "npm install --save-dev" so that next time you run the command npm will look only in our locally installed node_modules, this is faster.
+    installing webpack or any other library globally will force your pc to look for the global installation of node_modules under your username folder in your pc, which could include a large number of modules and libraries, this might be slightly slower, it is best to install it locally using "npm install --save-dev" so that next time you run the command npm will look only in our locally installed node_modules, this is faster.
 
 01. ) Remove the script tags that represents our three js files in our src/index.html file, the file becomes:
 
-```
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title></title>
-    <meta charset="UTF-8">
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-  </body>
-</html>
-```
+    ```
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <title></title>
+        <meta charset="UTF-8">
+      </head>
+      <body>
+        <h1>Hello World!</h1>
+      </body>
+    </html>
+    ```
 
 01. ) In the buildScripts/srcServer.js file remove the line below which we were using to demonstrate that we can't run our app without compiling it with webpack:
 
-```
-app.use(express.static(path.join(__dirname, '../src')));
-```
+    ```
+    app.use(express.static(path.join(__dirname, '../src')));
+    ```
 
-And add the following import statements:
+    And add the following import statements:
 
-```
-import webpack from 'webpack';
-import config from '../webpack.config.dev';
-```
+    ```
+    import webpack from 'webpack';
+    import config from '../webpack.config.dev';
+    ```
 
-Then add the following code:
+    Then add the following code:
 
-```
-const compiler = webpack(config);
+    ```
+    const compiler = webpack(config);
 
-app.use(require('webpack-dev-middleware')(compiler, {
-  noInfo: true,
-  publicPath: config.output.publicPath
-}));
-```
+    app.use(require('webpack-dev-middleware')(compiler, {
+      noInfo: true,
+      publicPath: config.output.publicPath
+    }));
+    ```
 
-The final version of our buildScripts/srcServer.js becomes:
+    The final version of our buildScripts/srcServer.js becomes:
 
-```
-import express from 'express';
-import path from 'path';
-import open from 'open';
-import webpack from 'webpack';
-import config from '../webpack.config.dev';
+    ```
+    import express from 'express';
+    import path from 'path';
+    import open from 'open';
+    import webpack from 'webpack';
+    import config from '../webpack.config.dev';
 
-const port = 3000;
-const app = express();
-const compiler = webpack(config);
+    const port = 3000;
+    const app = express();
+    const compiler = webpack(config);
 
-app.use(require('webpack-dev-middleware')(compiler, {
-  noInfo: true,
-  publicPath: config.output.publicPath
-}));
+    app.use(require('webpack-dev-middleware')(compiler, {
+      noInfo: true,
+      publicPath: config.output.publicPath
+    }));
 
-app.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname, '../src/index.html'));
-});
+    app.get('/', function(req, res) {
+      res.sendFile(path.join(__dirname, '../src/index.html'));
+    });
 
-app.listen(port, function(err) {
-  if (err) {
-    console.log(err);
-  } else {
-    open('http://localhost:' + port);
-  }
-});
-```
+    app.listen(port, function(err) {
+      if (err) {
+        console.log(err);
+      } else {
+        open('http://localhost:' + port);
+      }
+    });
+    ```
 
-With this configuration we can now use webpack as our dev server, to run the project using webpack dev server run this command:
+    With this configuration we can now use webpack as our dev server, to run the project using webpack dev server run this command:
 
-```
-webpack-dev-server
-```
+    ```
+    webpack-dev-server
+    ```
 
-We can also still run our app through express using the command:
+    We can also still run our app through express using the command:
 
-```
-babel-node buildScripts/srcServer.js
-```
+    ```
+    babel-node buildScripts/srcServer.js
+    ```
 
-To run our app with the webpack-dev-server we will use this command:
+    To run our app with the webpack-dev-server we will use this command:
 
-```
-webpack-dev-server --config webpack.config.dev.js
-```
+    ```
+    webpack-dev-server --config webpack.config.dev.js
+    ```
 
-Running the command "webpack-dev-server" alone like this:
+    Running the command "webpack-dev-server" alone like this:
 
-```
-webpack-dev-server
-```
+    ```
+    webpack-dev-server
+    ```
 
-will have webpack-dev-server assume you are using the default config file name: "webpack.config.js", which is not the case in our app, since our webpack config file is named: "webpack.config.dev.js", we can have several webpack config files if we need.
+    will have webpack-dev-server assume you are using the default config file name: "webpack.config.js", which is not the case in our app, since our webpack config file is named: "webpack.config.dev.js", we can have several webpack config files if we need.
 
 
 > **_//==============================================================\\_**
@@ -820,32 +792,32 @@ will have webpack-dev-server assume you are using the default config file name: 
 
 01. ) Install localtunnel globally:
 
-  ```
-  npm install -g localtunnel
-  ```
+    ```
+    npm install -g localtunnel
+    ```
 
 01. ) Run our app:
 
-  ```
-  node buildScripts/srcServer.js
-  ```
+    ```
+    node buildScripts/srcServer.js
+    ```
 
-  THe ap will open in the browser, Leave the app running
+    THe ap will open in the browser, Leave the app running
 
 01. ) Open another command line and run localtunnel from there:
 
-  ```
-  lt --port 3000
-  ```
+    ```
+    lt --port 3000
+    ```
 
-  localtunnel will return a url such as: <https://tbwsccjuzv.localtunnel.me/> from which we can access our app, you can provide this url to anyone to share yuor work in progress, 
-  we can even use this command:
+    localtunnel will return a url such as: <https://tbwsccjuzv.localtunnel.me/> from which we can access our app, you can provide this url to anyone to share yuor work in progress, 
+    we can even use this command:
 
-  ```
-  lt --port 3000 --subdomain asimtestapp
-  ```
+    ```
+    lt --port 3000 --subdomain asimtestapp
+    ```
 
-  It should return <https://asimtestapp.localtunnel.me/> that we can use.
+    It should return <https://asimtestapp.localtunnel.me/> that we can use.
 
 > **_//==============================================================\\_**
 >
@@ -862,211 +834,552 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
 
 01. ) This is how we create the "start" script in the package.json file:
 
-```
-    "scripts": {
-      "start": "node buildScripts/srcServer.js"
-    },
-```
+    ```
+        "scripts": {
+          "start": "node buildScripts/srcServer.js"
+        },
+    ```
 
-  now to run this script we run this in the command line:
+      now to run this script we run this in the command line:
 
-  ```
-  npm run start
-  ```
+      ```
+      npm run start
+      ```
 
-  or
+      or
 
-  ```
-  npm start
-  ```
+      ```
+      npm start
+      ```
 
-  The same applies for "npm test", all other npm scripts must be used with the "run" key word.
+      The same applies for "npm test", all other npm scripts must be used with the "run" key word.
 
 01. ) Creating a script that displays a message when running the app:
 
-  we do this by creating a startMessage.js file in the buildScripts folder with the following code:
+      we do this by creating a startMessage.js file in the buildScripts folder with the following code:
 
-  ```
-  var chalk = require('chalk');
-  console.log(chalk.green('Starting app in dev mode...'));
-  ```
+      ```
+      var chalk = require('chalk');
+      console.log(chalk.green('Starting app in dev mode...'));
+      ```
 
-  then we write an npm script to run it before our app runs, this is done with the prefix "pre", there is also a "post" prefix, these are called hooks, 
-  observe the script section of the package.json:
+      then we write an npm script to run it before our app runs, this is done with the prefix "pre", there is also a "post" prefix, these are called hooks, 
+      observe the script section of the package.json:
 
-```
-    "scripts": {
-      "prestart": "node buildScripts/startMessage.js",
-      "start": "node buildScripts/srcServer.js"
-    },
-```
+    ```
+        "scripts": {
+          "prestart": "node buildScripts/startMessage.js",
+          "start": "node buildScripts/srcServer.js"
+        },
+    ```
 
-  the script "prestart" will run before the "start" script, to see this in action run this command:
+      the script "prestart" will run before the "start" script, to see this in action run this command:
 
-  ```
-  npm start
-  ```
+      ```
+      npm start
+      ```
 
 01. ) Creating a script that runs the security check in parallel to the start script when the app starts, observe the "script section":
 
-```
-    "scripts": {
-      "prestart": "node buildScripts/startMessage.js",
-      "start": "npm-run-all --parallel security-check open:src",
-      "open:src": "node buildScripts/srcServer.js",
-      "security-check": "nsp check"
-    },
-```
+    ```
+        "scripts": {
+          "prestart": "node buildScripts/startMessage.js",
+          "start": "npm-run-all --parallel security-check open:src",
+          "open:src": "node buildScripts/srcServer.js",
+          "security-check": "nsp check"
+        },
+    ```
 
 
-  If you get too much info in the console, use:
+      If you get too much info in the console, use:
 
-  ```
-  npm start -s
-  ```
+      ```
+      npm start -s
+      ```
 
-  which will run the script in silent mode.
+      which will run the script in silent mode.
 
 01. ) Creating a script that runs localtunnel in parallel to the start script when the app starts, observe the "script section":
 
-```
-    "scripts": {
-      "prestart": "node buildScripts/startMessage.js",
-      "start": "npm-run-all --parallel security-check open:src",
-      "open:src": "node buildScripts/srcServer.js",
-      "security-check": "nsp check",
-      "localtunnel": "lt --port 3000",
-      "share": "npm-run-all --parallel open:src localtunnel"
-    },
-```
+    ```
+        "scripts": {
+          "prestart": "node buildScripts/startMessage.js",
+          "start": "npm-run-all --parallel security-check open:src",
+          "open:src": "node buildScripts/srcServer.js",
+          "security-check": "nsp check",
+          "localtunnel": "lt --port 3000",
+          "share": "npm-run-all --parallel open:src localtunnel"
+        },
+    ```
 
-This way we avoided opening two terminals at the same time like we did before when setting up localtunnel, we just run:
+    This way we avoided opening two terminals at the same time like we did before when setting up localtunnel, we just run:
 
-```
-npm run share
-```
-01. ) Creating a script that runs our app with the webpack-dev-server, observe the "script section":
-
-```
-    "scripts": {
-      "prestart": "node buildScripts/startMessage.js",
-      "start": "npm-run-all --parallel security-check open:src",
-      "open:src": "node buildScripts/srcServer.js",
-      "security-check": "nsp check",
-      "localtunnel": "lt --port 3000",
-      "share": "npm-run-all --parallel open:src localtunnel",
-      "serve": "webpack-dev-server --config webpack.config.dev.js"
-    },
-```
-
-To run the script:
-
-```
-npm run serve
-```
+    ```
+    npm run share
+    ```
 
 01. ) Creating a script that runs our app with the webpack-dev-server, observe the "script section":
 
-```
+    ```
+        "scripts": {
+          "prestart": "node buildScripts/startMessage.js",
+          "start": "npm-run-all --parallel security-check open:src",
+          "open:src": "node buildScripts/srcServer.js",
+          "security-check": "nsp check",
+          "localtunnel": "lt --port 3000",
+          "share": "npm-run-all --parallel open:src localtunnel",
+          "serve": "webpack-dev-server --config webpack.config.dev.js"
+        },
+    ```
+
+    To run the script:
+
+    ```
+    npm run serve
+    ```
+
+01. ) Creating a script that runs our app with the webpack-dev-server, observe the "script section":
+
+    ```
+        "scripts": {
+          "prestart": "node buildScripts/startMessage.js",
+          "start": "npm-run-all --parallel security-check open:src",
+          "open:src": "node buildScripts/srcServer.js",
+          "security-check": "nsp check",
+          "localtunnel": "lt --port 3000",
+          "share": "npm-run-all --parallel open:src localtunnel",
+          "clean": "rimraf build",
+          "serve": "webpack-dev-server --config webpack.config.dev.js"
+        },
+    ```
+
+    This script will delete all files in the build directory we use to compile our build files in.
+
+    ```
+    npm run clean
+    ```
+
+01. ) Our final scripts section in our package.json should look like this:
+
+    ```
+    {
+      "name": "react-redux-weback2-starter",
+      "version": "1.0.0",
+      "description": "Starter kit with React, Redux and Webpack2",
+      "scripts": {
+        "prestart": "babel-node buildScripts/startMessage.js",
+        "start": "npm-run-all --parallel security-check open:src",
+        "open:src": "babel-node buildScripts/srcServer.js",
+        "security-check": "nsp check",
+        "localtunnel": "lt --port 3000",
+        "share": "npm-run-all --parallel open:src localtunnel",
+        "clean": "rimraf build",
+        "serve": "webpack-dev-server"
+      },
+      "author": "Asim Abdelgadir",
+      "license": "MIT",
+      "dependencies": {
+        "babel-polyfill": "6.8.0",
+        "bootstrap": "3.3.6",
+        "jquery": "2.2.3",
+        "numeral": "^2.0.4",
+        "react": "15.0.2",
+        "react-dom": "15.0.2",
+        "react-redux": "4.4.5",
+        "react-router": "2.4.0",
+        "react-router-redux": "4.0.4",
+        "redux": "3.5.2",
+        "redux-thunk": "2.0.1",
+        "toastr": "2.1.2"
+      },
+      "devDependencies": {
+        "babel-cli": "6.8.0",
+        "babel-core": "6.8.0",
+        "babel-loader": "6.2.4",
+        "babel-plugin-react-display-name": "2.0.0",
+        "babel-preset-es2015": "6.6.0",
+        "babel-preset-react": "6.5.0",
+        "babel-preset-react-hmre": "1.1.1",
+        "babel-register": "6.8.0",
+        "cheerio": "0.22.0",
+        "colors": "1.1.2",
+        "compression": "1.6.1",
+        "cross-env": "1.0.7",
+        "css-loader": "^0.23.1",
+        "enzyme": "2.2.0",
+        "eslint": "2.9.0",
+        "eslint-plugin-import": "1.6.1",
+        "eslint-plugin-react": "5.0.1",
+        "eslint-watch": "2.1.11",
+        "eventsource-polyfill": "0.9.6",
+        "expect": "1.19.0",
+        "express": "4.13.4",
+        "extract-text-webpack-plugin": "1.0.1",
+        "file-loader": "0.8.5",
+        "html-webpack-plugin": "^2.28.0",
+        "image-webpack-loader": "^3.2.0",
+        "jsdom": "8.5.0",
+        "localtunnel": "^1.8.2",
+        "mocha": "2.4.5",
+        "nock": "8.0.0",
+        "npm-run-all": "1.8.0",
+        "nsp": "^2.6.2",
+        "open": "0.0.5",
+        "react-addons-test-utils": "15.0.2",
+        "redux-immutable-state-invariant": "1.2.3",
+        "redux-mock-store": "1.0.2",
+        "rimraf": "^2.5.2",
+        "style-loader": "^0.13.1",
+        "url-loader": "^0.5.7",
+        "webpack": "^2.2.1",
+        "webpack-dev-middleware": "^1.6.1",
+        "webpack-dev-server": "^2.4.1",
+        "webpack-hot-middleware": "^2.10.0",
+        "webpack-md5-hash": "^0.0.5"
+      },
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/zonender/react-redux-weback2-starter"
+      }
+    }
+    ```
+> **_//==============================================================\\_**
+>
+> **_CONFIGURING ESLINT_**
+>
+> **_\\==============================================================//_**
+
+01. ) Create a .eslintrc.json file in the root with the following code: 
+
+    ```
+    {
+      "root": true,
+      "extends": [
+        "eslint:recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings"
+      ],
+      "parserOptions": {
+        "ecmaVersion": 7,
+        "sourceType": "module"
+      },
+      "env": {
+        "browser": true,
+        "node": true,
+        "mocha": true
+      },
+      "rules": {
+        "no-console": 1
+      }
+    }
+    ```
+
+01. ) Then write the following npm script:
+
+    ```
     "scripts": {
-      "prestart": "node buildScripts/startMessage.js",
+      "prestart": "babel-node buildScripts/startMessage.js",
       "start": "npm-run-all --parallel security-check open:src",
-      "open:src": "node buildScripts/srcServer.js",
+      "open:src": "babel-node buildScripts/srcServer.js",
       "security-check": "nsp check",
       "localtunnel": "lt --port 3000",
       "share": "npm-run-all --parallel open:src localtunnel",
       "clean": "rimraf build",
-      "serve": "webpack-dev-server --config webpack.config.dev.js"
+      "serve": "webpack-dev-server",
+      "lint": "esw webpack.config.* src buildScripts --color",
+      "lint:watch": "npm run lint -- --watch"
     },
-```
+    ```
 
-This script will delete all files in the build directory we use to compile our build files in.
+    make sure to disable any linting features your editor may have, otherwise you run the risk of overriding your linting rules with those of the editor's
 
-```
-npm run clean
-```
+01. ) We can even have eslint run in watch mode when we run "npm start":
 
-01. ) Our final scripts section in our package.json should look like this:
+    ```
+    "scripts": {
+      "prestart": "babel-node buildScripts/startMessage.js",
+      "start": "npm-run-all --parallel security-check open:src",
+      "open:src": "babel-node buildScripts/srcServer.js",
+      "security-check": "nsp check",
+      "localtunnel": "lt --port 3000",
+      "share": "npm-run-all --parallel open:src localtunnel",
+      "clean": "rimraf build",
+      "serve": "webpack-dev-server",
+      "lint": "esw webpack.config.* src buildScripts --color",
+      "lint:watch": "npm run lint -- --watch"
+    },
+    ```
 
-```
-{
-  "name": "react-redux-weback2-starter",
-  "version": "1.0.0",
-  "description": "Starter kit with React, Redux and Webpack2",
-  "scripts": {
-    "prestart": "babel-node buildScripts/startMessage.js",
-    "start": "npm-run-all --parallel security-check open:src",
-    "open:src": "babel-node buildScripts/srcServer.js",
-    "security-check": "nsp check",
-    "localtunnel": "lt --port 3000",
-    "share": "npm-run-all --parallel open:src localtunnel",
-    "clean": "rimraf build",
-    "serve": "webpack-dev-server"
-  },
-  "author": "Asim Abdelgadir",
-  "license": "MIT",
-  "dependencies": {
-    "babel-polyfill": "6.8.0",
-    "bootstrap": "3.3.6",
-    "jquery": "2.2.3",
-    "numeral": "^2.0.4",
-    "react": "15.0.2",
-    "react-dom": "15.0.2",
-    "react-redux": "4.4.5",
-    "react-router": "2.4.0",
-    "react-router-redux": "4.0.4",
-    "redux": "3.5.2",
-    "redux-thunk": "2.0.1",
-    "toastr": "2.1.2"
-  },
-  "devDependencies": {
-    "babel-cli": "6.8.0",
-    "babel-core": "6.8.0",
-    "babel-loader": "6.2.4",
-    "babel-plugin-react-display-name": "2.0.0",
-    "babel-preset-es2015": "6.6.0",
-    "babel-preset-react": "6.5.0",
-    "babel-preset-react-hmre": "1.1.1",
-    "babel-register": "6.8.0",
-    "cheerio": "0.22.0",
-    "colors": "1.1.2",
-    "compression": "1.6.1",
-    "cross-env": "1.0.7",
-    "css-loader": "^0.23.1",
-    "enzyme": "2.2.0",
-    "eslint": "2.9.0",
-    "eslint-plugin-import": "1.6.1",
-    "eslint-plugin-react": "5.0.1",
-    "eslint-watch": "2.1.11",
-    "eventsource-polyfill": "0.9.6",
-    "expect": "1.19.0",
-    "express": "4.13.4",
-    "extract-text-webpack-plugin": "1.0.1",
-    "file-loader": "0.8.5",
-    "html-webpack-plugin": "^2.28.0",
-    "image-webpack-loader": "^3.2.0",
-    "jsdom": "8.5.0",
-    "localtunnel": "^1.8.2",
-    "mocha": "2.4.5",
-    "nock": "8.0.0",
-    "npm-run-all": "1.8.0",
-    "nsp": "^2.6.2",
-    "open": "0.0.5",
-    "react-addons-test-utils": "15.0.2",
-    "redux-immutable-state-invariant": "1.2.3",
-    "redux-mock-store": "1.0.2",
-    "rimraf": "^2.5.2",
-    "style-loader": "^0.13.1",
-    "url-loader": "^0.5.7",
-    "webpack": "^2.2.1",
-    "webpack-dev-middleware": "^1.6.1",
-    "webpack-dev-server": "^2.4.1",
-    "webpack-hot-middleware": "^2.10.0",
-    "webpack-md5-hash": "^0.0.5"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/zonender/react-redux-weback2-starter"
-  }
-}
-```
+    make sure to disable any linting features your editor may have, otherwise you run the risk of overriding your linting rules with those of the editor's
+
+> **_//==============================================================\\_**
+>
+> **_Tweaking WEBPACK.CONFIG.DEV.JS and Creating WEBPACK.CONFIG.PROD.JS_**
+>
+> **_\\==============================================================//_**
+
+It is good proctise to have two separate webpack.config files, one for the dev env and the other for the prod env.
+
+01. ) Modify the webpack.config.dev.js file as follows:
+
+    ```
+    const webpack = require('webpack');
+    const path = require('path');
+    const htmlWebpackPlugin = require('html-webpack-plugin');
+
+    const config = {
+      //The entry point for the bundle.
+      entry: {
+        bundle: path.resolve(__dirname, 'src/index')
+      },
+      output: {
+        path: path.join(__dirname, 'build'),
+        publicPath: '/',
+        filename: 'bundle.js'
+      },
+      module: {
+        rules: [
+          {
+            use: 'babel-loader', //here we are selecting the loader
+            test: /\.js$/, //and here we specify which file the loader will process
+            exclude: /node_modules/
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
+          },
+          {
+            test: /\.(jpe?g|jpg|png|gif|svg)$/,
+            use: [
+              {
+                loader: 'url-loader'
+              },
+              'image-webpack-loader'
+            ]
+          }
+        ]
+      },
+      plugins: [
+          //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
+          new htmlWebpackPlugin({
+                template: 'src/index.html' //if we do not specifiy a template, it will use the default one
+          }),
+          new webpack.LoaderOptionsPlugin({
+            options: {
+                noInfo: false,
+                debug: true,
+                devtool: 'inline-source-map',
+                target: 'web'
+            }
+          })
+      ]
+    };
+
+    module.exports = config;
+    ```
+
+01. ) Create a production webpack config file named: webpack.config.prod.js with the following code:
+
+    ```
+    const webpack = require('webpack');
+    const path = require('path');
+    const htmlWebpackPlugin = require('html-webpack-plugin');
+
+    //our app third party dependencies
+    const VENDOR_LIBS = [
+      'babel-polyfill', 'bootstrap', 'jquery', 'numeral', 'react', 'react-dom', 'react-redux',
+      'react-router', 'react-router-redux', 'redux', 'redux-thunk', 'toastr'
+    ];
+
+    const config = {
+      devtool: 'source-map',
+      //The entry point for the bundle.
+      entry: {
+        bundle: path.resolve(__dirname, 'src/index'),
+        vendor: VENDOR_LIBS
+      },
+      output: {
+        path: path.join(__dirname, 'dist'),
+        publicPath: '/',
+        filename: '[name][chunkhash].js'
+      },
+      module: {
+        rules: [
+          {
+            use: 'babel-loader', //here we are selecting the loader
+            test: /\.js$/, //and here we specify which file the loader will process
+            exclude: /node_modules/
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
+          },
+          {
+            test: /\.(jpe?g|jpg|png|gif|svg)$/,
+            use: [
+              {
+                loader: 'url-loader',
+                options: { limit: 40000 }
+              },
+              'image-webpack-loader'
+            ]
+          }
+        ]
+      },
+      plugins: [
+          //Eliminate duplicate packages when bundling
+          new webpack.optimize.DedupePlugin(),
+          //Minify JS
+          new webpack.optimize.UglifyJsPlugin(),
+          //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there
+          //are it will remove them from bundle.js and put them in vendor.js
+          new webpack.optimize.CommonsChunkPlugin({
+                names: ['vendor', 'manifest']
+          }),
+          //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
+          new htmlWebpackPlugin({
+                template: 'src/index.html' //if we do not specifiy a template, it will use the default one
+          }),
+          //when reactjs runs it looks for this window scoped variable called process.env.NODE_ENV,
+          //if the value of this varaible is production react will not do too many error checking procedures,
+          //which also takes too long to run.
+          new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+          }),
+          new webpack.LoaderOptionsPlugin({
+            options: {
+                noInfo: false,
+                debug: true,
+                devtool: 'inline-source-map',
+                target: 'web'
+            }
+          })
+      ]
+    };
+
+    module.exports = config;
+    ```
+> **_//==============================================================\\_**
+>
+> **_Creating a webpack build for production_**
+>
+> **_\\==============================================================//_**
+
+01. ) Create a build.js file under the buildScripts directory with the following code:
+
+    ```
+    /*eslint-disable no-console */
+    import webpack from 'webpack';
+    import webpackConfig from '../webpack.config.prod';
+    import chalk from 'chalk';
+
+    //this is important if you create a dev specific configuration for babel,
+    //other libraries might look for this env variable to determine how they get built.
+    process.env.NODE_ENV = 'production';
+
+    console.log(chalk.blue('Generating minified bundle for production. This will take a moment...'));
+
+    webpack(webpackConfig).run((err, stats) => {
+      if (err) { // so a fatal error occurred. Stop here.
+        console.log(chalk.red(err));
+        return 1;
+      }
+
+      //and these are just warnings errors and stats displayed to the command line:
+      const jsonStats = stats.toJson();
+
+      if (jsonStats.hasErrors) {
+        return jsonStats.errors.map(error => console.log(chalk.red(error)));
+      }
+
+      if (jsonStats.hasWarnings) {
+        console.log(chalk.yellow('Webpack generated the following warnings: '));
+        jsonStats.warnings.map(warning => console.log(chalk.yellow(warning)));
+      }
+
+      console.log(`Webpack stats: ${stats}`);
+
+      // if we got this far, the build succeeded.
+      console.log(chalk.green('Your app has been built for production and written to /dist!'));
+
+      return 0;
+    });
+    ```
+
+01. ) Setup an automated production build:
+
+  01. ) Create a file named "distServer.js" in the buildScripts folder and add this code to it:
+
+      ```
+    //this is all we need for our dist server to serve our app locally for dubugging,
+    //this is NOT for production, this is just to see how the app looks like on the local machine,
+    //and to confirm it works locally.
+    //typically these files should be uploaded to some host that will serve them through the internet.
+    import express from 'express';
+    import path from 'path';
+    import open from 'open';
+    //we will remove any call for webpack since we will no longer going to be
+    //interacting with webpack for our dist server, we are going to be serving the statis
+    //built files
+    // import webpack from 'webpack';
+    // import config from '../webpack.config.dev';
+
+    const port = 3000;
+    const app = express();
+
+    //also we should enable gzip compression for our dist server
+    app.use(compression());
+    //we will have to add support for express for serving static files:
+    app.use(express.static('dist'));
+
+    //also remove the call to the compiler
+    // const compiler = webpack(config);
+
+    //also remove the call to configue webpack middleware
+    // app.use(require('webpack-dev-middleware')(compiler, {
+    //   noInfo: true,
+    //   publicPath: config.output.publicPath
+    // }));
+
+    //and for prod we will be serving html from the dist folder not the src folder
+    app.get('/', function(req, res) {
+      res.sendFile(path.join(__dirname, '../dist/index.html'));
+    });
+
+    app.listen(port, function(err) {
+      if (err) {
+        console.log(err);
+      } else {
+        open('http://localhost:' + port);
+      }
+    });
+      ```
+
+      Just like we have a srcServer to serve our src folder, we now have a distServer to serve our dist folder.
+
+  01. ) Create the npm scripts to create our build:
+
+      ```
+      "scripts": {
+        "prestart": "babel-node buildScripts/startMessage.js",
+        "start": "npm-run-all --parallel security-check open:src",
+        "open:src": "babel-node buildScripts/srcServer.js",
+        "security-check": "nsp check",
+        "localtunnel": "lt --port 3000",
+        "share": "npm-run-all --parallel open:src localtunnel",
+        "clean": "rimraf build",
+        "serve": "webpack-dev-server",
+        "lint": "esw webpack.config.* src buildScripts --color; exit 0",
+        "lint:watch": "npm run lint -- --watch",
+        "clean-dist": "rimraf ./dist && mkdir dist",
+        "prebuild": "npm-run-all clean-dist lint",
+        "build": "babel-node buildScripts/build.js",
+        "postbuild": "babel-node buildScripts/distServer.js"
+      },
+      ```
+      To test this run:
+
+      ```
+      npm run build
+      ```
+
