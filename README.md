@@ -428,7 +428,7 @@ nsp check
   start src/index.html
   ```
 
-  The page will open in your browser without the server.
+  The page will open in your browser without the server, the page should display only: "Hello World!".
 
 > **_//==============================================================\\_**
 >
@@ -436,18 +436,17 @@ nsp check
 >
 > **_\\==============================================================//_**
 
-In order to use ES6 we will need to configure Babel, it is already included in our package.json, to configure Babel:
+Transpiling means changing ES6 code (ES2015) into ES5 to ensure our JS code runs in the browsers that do not yet fully support the latest version of JS, we will 
+now be using ES5 and Babel will transpile our code to ES5, we already installed Babel when we first ran "npm install" it is one of the many packages included in 
+our package.json, so we just have to configure it:
+
+To configure babel:
 
 01. ) Create a file called: .babelrc with the following code:
 
 ```
 {
-  "presets": ["react", "es2015"],
-  "env": {
-    "development": {
-      "presets": ["react-hmre"]
-    }
-  }
+  "presets": ["react", "es2015"]
 }
 ```
 
@@ -459,46 +458,12 @@ babel-node buildScripts/srcServer.js
 
 > **_//==============================================================\\_**
 >
-> **_SETTING UP WEBPACK AS A DEVELOPMENT SERVER_**
->
-> **_\\==============================================================//_**
-
-01. ) Create a webpack.config.dev.js file with the following code:
-
-This is the absolute minimum to run webpack.
-
-```
-import webpack from 'webpack';
-import path from 'path'
-
-export default {
-  entry: './src/index.js',
-  output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'bundle.js'
-  }
-};
-```
-
-path makes sure we get the path we need regardless of the OS it is running on.
-
-__dirname is the current directory. (where webpack.config.dev.js is located)
-
-entry: "./src/index.js" is the top level file we want to include in our build.
-
-filename: "bundle.js" is the output file that has includes all out JS code.
-
-installing webpack or any other library globally will force your pc to look for the global installation of node_modules under your username folder in your pc, which could include a large number of modules and libraries, this might be slightly slower, it is best to install it locally using "npm install --save-dev" so that next time you run the command npm will look only in our locally installed node_modules, this is faster.
-
-
-
-> **_//==============================================================\\_**
->
 > **_CREATING A BASIC APP_**
 >
 > **_\\==============================================================//_**
 
-01. ) Create an index.js file with the following code and save it under src:
+
+01. ) Create an src/index.js file with the following code and save it under src:
 
   ```
   import talk from './talktoconsole';
@@ -515,7 +480,7 @@ installing webpack or any other library globally will force your pc to look for 
   document.body.appendChild(button);
   ```
 
-01. ) Create the file talkToConsole.js with the following code:
+01. ) Create the file src/talkToConsole.js with the following code:
   
   ```
   import numeral from 'numeral';
@@ -524,7 +489,7 @@ installing webpack or any other library globally will force your pc to look for 
 
   export default talk;
   ```
-01. ) Create the file image_viewer.js with the following code:
+01. ) Create the file src/image_viewer.js with the following code:
 
   ```
   import small from '../assets/small.jpg';
@@ -559,210 +524,268 @@ installing webpack or any other library globally will force your pc to look for 
   };
   ```
 
-01. ) Create a styles folder in the src folder, within the styles folder create a css file called style.css with the following css code:
+01. ) Create a src/styles folder, within the styles folder create a css file src/styles/style.css with the following css code:
 
 ```
 img {
     border: 10px solid red;
 }
 ```
-01. ) Create an asstes folder in the root directory and save the following images into them:
+01. ) Create an assets folder in the root directory and save the following images into them:
 
 http://lorempixel.com/200/200/ - call this small.jpg
 
 http://lorempixel.com/1200/1200/ - call this big.jpg
 
+01. ) Now we must include the three new js files in our src/index.html page as script tags just before the closing "body" tag like this:
 
+```
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="image_viewer.js"></script>
+    <script type="text/javascript" src="talkToConsole.js"></script>
 
+```
 
+So our src/index.html becomes:
 
+```
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="image_viewer.js"></script>
+    <script type="text/javascript" src="talkToConsole.js"></script>
+  </body>
+</html>
+```
 
+01. ) Then we have to make sure they are served through the express server by adding the following line in our srcServer.js file:
 
+```
+app.use(express.static(path.join(__dirname, '../src')));
+```
 
+So our srcServer.js file becomes:
 
+```
+import express from 'express';
+import path from 'path';
+import open from 'open';
 
+const port = 3000;
+const app = express();
 
+app.use(express.static(path.join(__dirname, '../src')));
 
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, '../src/index.html'));
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-> **_//==============================================================\\_**
->
-> **_SETTING UP WEBPACK FOR BUNDLING_**
->
-> **_\\==============================================================//_**
-
-01. ) Before we configure webpack, we will have to create an app that does something simple for demonstration purposes, to do this
- we will create a simple app that has several js files that webpack will bundle together into a single file called bundle.js, webpack will also bundle any css,
- and images into the bundle.js file, then webpack will inject this file in the index.html file, so now let's prepare things for webpack before we start using it.
-
-01. ) We already have an index.html file, so let us add the following js files:
-
-  01. ) Create an index.js file with the following code and save it under src:
-
-    ```
-    import talk from './talktoconsole';
-    console.log(talk(1, 2));
-
-    const button = document.createElement('button');
-    button.innerText = 'Click me';
-    button.onclick = () => {
-        System.import('./image_viewer').then(module => {
-            module.default();
-        });
-    };
-
-    document.body.appendChild(button);
-    ```
-
-  01. ) Create the file talkToConsole.js with the following code:
-    
-    ```
-    import numeral from 'numeral';
-
-    const talk = (a, b) =>numeral(a + b).format('$0.0.00');
-
-    export default talk;
-    ```
-  01. ) Create the file image_viewer.js with the following code:
-  
-    ```
-    import small from '../assets/small.jpg';
-    import big from '../assets/big.jpg';
-    import './styles/image_viewer.css';
-
-    export default () => {
-
-        const smallImageDescription = document.createElement('p');
-        smallImageDescription.innerText = 'This is a small Image that was small enough to be bundled into bundle.js';
-        document.body.appendChild(smallImageDescription);
-
-        const smallImage = document.createElement('img');
-        smallImage.src = small;
-        document.body.appendChild(smallImage);
-
-        const bigImageDescription = document.createElement('p');
-        bigImageDescription.innerText = 'This is a big Image, because it is large it was not bundled in bundle.js';
-        document.body.appendChild(bigImageDescription);
-
-        const bigImage = document.createElement('img');
-        bigImage.src = big;
-        document.body.appendChild(bigImage);
-
-        const randomImageDescription = document.createElement('p');
-        randomImageDescription.innerText = 'This is a random image generated from http://lorempixel.com/';
-        document.body.appendChild(randomImageDescription);
-
-        const randomImage = document.createElement('img');
-        randomImage.src = 'http://lorempixel.com/400/200/';
-        document.body.appendChild(randomImage);
-    };
-    ```
-
-  01. ) Create a styles folder in the src folder, within the styles folder create a css file called style.css with the following css code:
-
-  ```
-  img {
-      border: 10px solid red;
+app.listen(port, function(err) {
+  if (err) {
+    console.log(err);
+  } else {
+    open('http://localhost:' + port);
   }
-  ```
-  01. ) Create an asstes folder in the root directory and save the following images into them:
+});
+```
 
-  http://lorempixel.com/200/200/ - call this small.jpg
+Now run the app by running the following command, please note that the app will not run as expected:
 
-  http://lorempixel.com/1200/1200/ - call this big.jpg
+```
+babel-node buildScripts/srcServer.js
+```
 
-01. ) Now that we have a working app, we can now configure webpack, we also installed it when we first ran npm install, so now we just have to configure it, we will first have to create
-  the file: webpack.config.js and add the following code to it:
+We are supposed to see a button labeled "Click me", it will not show up, and if you use the "inspect element" tool and open the console, you will see the error message:
+
+Uncaught SyntaxError: Unexpected token import      index.js:1
+Uncaught SyntaxError: Unexpected token import      image_viewer.js:1
+Uncaught SyntaxError: Unexpected token import      talkToConsole.js:1
+
+This is because the browser is unable to interpret the ES6 "import" statement in the first line of each file, to solve this we will need to install webpack to compile the code and 
+bundle it in a single file and in plain JS so that the broweser can understand it and eventually display our button along with its functionality.
+
+> **_//==============================================================================\\_**
+>
+> **_SETTING UP WEBPACK AS A DEVELOPMENT SERVER AND COMPILING AND BUNDLING OUR CODE_**
+>
+> **_\\==============================================================================//_**
+
+Now that we have a working app, we can now configure webpack.
 
   For more on the configuration of webpack 2: https://github.com/webpack/docs/wiki/configuration
   For more on webpack's cli commands: https://webpack.github.io/docs/cli.html
 
-  ```
-  const webpack = require('webpack');
-  const path = require('path');
-  const htmlWebpackPlugin = require('html-webpack-plugin');
+01. ) Create a webpack.config.dev.js file in our root with the following code:
 
-  //our app third party dependencies
-  const VENDOR_LIBS = [
-    'faker', 'lodash', 'react', 'react-dom', 'react-input-range', 'react-redux',
-    'react-router', 'redux', 'redux-form', 'redux-thunk', 'whatwg-fetch'
-  ];
+```
+const webpack = require('webpack');
+const path = require('path');
+const htmlWebpackPlugin = require('html-webpack-plugin');
 
-  const config = {
-    //The entry point for the bundle.
-    entry: {
-      bundle: path.resolve(__dirname, 'src/index'),
-      vendor: VENDOR_LIBS
-    },
-    output: {
-      path: path.join(__dirname, 'build'),
-      publicPath: '/',
-      filename: '[name][chunkhash].js'
-    },
-    module: {
-      rules: [
-        {
-          use: 'babel-loader', //here we are selecting the loader
-          test: /\.js$/, //and here we specify which file the loader will process
-          exclude: /node_modules/
-        },
-        {
-          test: /\.css$/,
-          use: ['style-loader', 'css-loader'],
-        },
-        {
-          test: /\.(jpe?g|png|gif|svg)$/,
-          use: [
-            {
-              loader: 'url-loader',
-              options: { limit: 40000 }
-            },
-            'image-webpack-loader'
-          ]
-        }
-      ]
-    },
-    plugins: [
-        //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
-        new webpack.optimize.CommonsChunkPlugin({
-              names: ['vendor', 'manifest']
-        }),
-        //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
-        new htmlWebpackPlugin({
-              template: 'src/index.html' //if we do not specifiy a template, it will use the default one
-        }),
-        //when reactjs runs it looks for this window scoped variable called process.env.NODE_ENV,
-        //if the value of this varaible is production react will not do too many error checking procedures,
-        //which also takes too long to run.
-        new webpack.DefinePlugin({
-          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-        }),
-        new webpack.LoaderOptionsPlugin({
-          options: {
-              noInfo: false,
-              debug: true,
-              devtool: 'inline-source-map',
-              target: 'web',
-          }
-        })
+//our app third party dependencies
+const VENDOR_LIBS = [
+  'babel-polyfill', 'bootstrap', 'jquery', 'numeral', 'react', 'react-dom', 'react-redux',
+  'react-router', 'react-router-redux', 'redux', 'redux-thunk', 'toastr'
+];
+
+const config = {
+  //The entry point for the bundle.
+  entry: {
+    bundle: path.resolve(__dirname, 'src/index'),
+    vendor: VENDOR_LIBS
+  },
+  output: {
+    path: path.join(__dirname, 'build'),
+    publicPath: '/',
+    filename: '[name][chunkhash].js'
+  },
+  module: {
+    rules: [
+      {
+        use: 'babel-loader', //here we are selecting the loader
+        test: /\.js$/, //and here we specify which file the loader will process
+        exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(jpe?g|jpg|png|gif|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: { limit: 40000 }
+          },
+          'image-webpack-loader'
+        ]
+      }
     ]
-  };
+  },
+  plugins: [
+      //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
+      new webpack.optimize.CommonsChunkPlugin({
+            names: ['vendor', 'manifest']
+      }),
+      //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
+      new htmlWebpackPlugin({
+            template: 'src/index.html' //if we do not specifiy a template, it will use the default one
+      }),
+      //when reactjs runs it looks for this window scoped variable called process.env.NODE_ENV,
+      //if the value of this varaible is production react will not do too many error checking procedures,
+      //which also takes too long to run.
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      }),
+      new webpack.LoaderOptionsPlugin({
+        options: {
+            noInfo: false,
+            debug: true,
+            devtool: 'inline-source-map',
+            target: 'web',
+        }
+      })
+  ]
+};
 
-  module.exports = config;
-  ```
+module.exports = config;
+```
 
-With this configuration we can also use webpack as our dev server, to run the project using webpack dev server run this command:
+- path makes sure we get the path we need regardless of the OS it is running on.
+
+- __dirname is the current directory. (where webpack.config.dev.js is located)
+
+- entry: "./src/index.js" is the top level file we want to include in our build.
+
+- filename: "bundle.js" is the output file that has includes all out JS code.
+
+Please note that webpack will not physically create a bundle.js file in our directory when we later run "webpack-dev-server", rather it will create everything 
+in memory, the physical file bundle.js and any other required file will be created later when we compile our code using the "webpack" command.
+
+Webpack will bundle together all our js files into a single file called bundle.js, webpack will also bundle any css,
+ and images into the bundle.js file, then webpack will inject this file in the index.html file, so now let's prepare things for webpack before we start using it.
+
+Webpack will also split our code to improve loaiding performance.
+
+installing webpack or any other library globally will force your pc to look for the global installation of node_modules under your username folder in your pc, which could include a large number of modules and libraries, this might be slightly slower, it is best to install it locally using "npm install --save-dev" so that next time you run the command npm will look only in our locally installed node_modules, this is faster.
+
+01. ) Remove the script tags that represents our three js files in our src/index.html file, the file becomes:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+  </body>
+</html>
+```
+
+01. ) In the buildScripts/srcServer.js file remove the line below which we were using to demonstrate that we can't run our app without compiling it with webpack:
+
+```
+app.use(express.static(path.join(__dirname, '../src')));
+```
+
+And add the following import statements:
+
+```
+import webpack from 'webpack';
+import config from '../webpack.config.dev';
+```
+
+Then add the following code:
+
+```
+const compiler = webpack(config);
+
+app.use(require('webpack-dev-middleware')(compiler, {
+  noInfo: true,
+  publicPath: config.output.publicPath
+}));
+```
+
+The final version of our buildScripts/srcServer.js becomes:
+
+```
+import express from 'express';
+import path from 'path';
+import open from 'open';
+import webpack from 'webpack';
+import config from '../webpack.config.dev';
+
+const port = 3000;
+const app = express();
+const compiler = webpack(config);
+
+app.use(require('webpack-dev-middleware')(compiler, {
+  noInfo: true,
+  publicPath: config.output.publicPath
+}));
+
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, '../src/index.html'));
+});
+
+app.listen(port, function(err) {
+  if (err) {
+    console.log(err);
+  } else {
+    open('http://localhost:' + port);
+  }
+});
+```
+
+With this configuration we can now use webpack as our dev server, to run the project using webpack dev server run this command:
 
 ```
 webpack-dev-server
@@ -774,79 +797,20 @@ We can also still run our app through express using the command:
 babel-node buildScripts/srcServer.js
 ```
 
-01. ) Now we can modify our npm scripts to accomoodate the new functionality we have added:
+To run our app with the webpack-dev-server we will use this command:
 
 ```
-{
-  "name": "setting-up-javascript-react-development-environment",
-  "version": "1.0.0",
-  "description": "Setting up a React development environment with webpack",
-  "scripts": {
-    "prestart": "babel-node buildScripts/startMessage.js",
-    "start": "npm-run-all --parallel security-check open:src",
-    "open:src": "babel-node buildScripts/srcServer.js",
-    "security-check": "nsp check",
-    "localtunnel": "lt --port 3000",
-    "share": "npm-run-all --parallel open:src localtunnel",
-    "clean": "rimraf build",
-    "serve": "webpack-dev-server"
-  },
-  "author": "Asim Abdelgadir",
-  "license": "MIT",
-  "dependencies": {
-    "whatwg-fetch": "1.0.0",
-    "faker": "^3.1.0",
-    "lodash": "^4.17.2",
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
-    "react-input-range": "^0.9.2",
-    "react-redux": "^4.4.6",
-    "react-router": "^3.0.0",
-    "redux": "^3.6.0",
-    "redux-form": "^6.3.2",
-    "redux-thunk": "^2.1.0"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.23.0",
-    "babel-core": "^6.17.0",
-    "babel-loader": "^6.2.5",
-    "babel-preset-latest": "^6.16.0",
-    "babel-preset-react": "^6.16.0",
-    "babel-register": "^6.16.3",
-    "chai": "3.5.0",
-    "chalk": "1.1.3",
-    "cheerio": "0.22.0",
-    "compression": "1.6.2",
-    "cross-env": "3.1.3",
-    "css-loader": "^0.26.1",
-    "eslint": "3.8.1",
-    "eslint-plugin-import": "2.0.1",
-    "eslint-watch": "2.1.14",
-    "express": "4.14.0",
-    "extract-text-webpack-plugin": "1.0.1",
-    "html-webpack-plugin": "^2.28.0",
-    "image-webpack-loader": "^3.2.0",
-    "jsdom": "9.8.0",
-    "json-schema-faker": "0.3.6",
-    "json-server": "0.8.22",
-    "localtunnel": "1.8.1",
-    "mocha": "3.1.2",
-    "nock": "8.1.0",
-    "npm-run-all": "3.1.1",
-    "nsp": "2.6.2",
-    "numeral": "1.5.3",
-    "open": "0.0.5",
-    "rimraf": "2.5.4",
-    "style-loader": "0.13.1",
-    "url-loader": "^0.5.7",
-    "webpack": "2.2.0-rc.0",
-    "webpack-dev-middleware": "1.8.4",
-    "webpack-dev-server": "^2.3.0",
-    "webpack-hot-middleware": "2.13.0",
-    "webpack-md5-hash": "0.0.5"
-  }
-}
+webpack-dev-server --config webpack.config.dev.js
 ```
+
+Running the command "webpack-dev-server" alone like this:
+
+```
+webpack-dev-server
+```
+
+will have webpack-dev-server assume you are using the default config file name: "webpack.config.js", which is not the case in our app, since our webpack config file is named: "webpack.config.dev.js", we can have several webpack config files if we need.
+
 
 > **_//==============================================================\\_**
 >
@@ -898,56 +862,12 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
 
 01. ) This is how we create the "start" script in the package.json file:
 
-  ```
-  {
-    "name": "javascript-development-environment",
-    "version": "1.0.0",
-    "description": "JavaScript development environment Pluralsight course by Cory House",
+```
     "scripts": {
       "start": "node buildScripts/srcServer.js"
     },
-    "author": "Cory House",
-    "license": "MIT",
-    "dependencies": {
-      "whatwg-fetch": "1.0.0"
-    },
-    "devDependencies": {
-      "babel-cli": "6.16.0",
-      "babel-core": "6.17.0",
-      "babel-loader": "6.2.5",
-      "babel-preset-latest": "6.16.0",
-      "babel-register": "6.16.3",
-      "chai": "3.5.0",
-      "chalk": "1.1.3",
-      "cheerio": "0.22.0",
-      "compression": "1.6.2",
-      "cross-env": "3.1.3",
-      "css-loader": "0.25.0",
-      "eslint": "3.8.1",
-      "eslint-plugin-import": "2.0.1",
-      "eslint-watch": "2.1.14",
-      "express": "4.14.0",
-      "extract-text-webpack-plugin": "1.0.1",
-      "html-webpack-plugin": "2.22.0",
-      "jsdom": "9.8.0",
-      "json-schema-faker": "0.3.6",
-      "json-server": "0.8.22",
-      "localtunnel": "1.8.1",
-      "mocha": "3.1.2",
-      "nock": "8.1.0",
-      "npm-run-all": "3.1.1",
-      "nsp": "2.6.2",
-      "numeral": "1.5.3",
-      "open": "0.0.5",
-      "rimraf": "2.5.4",
-      "style-loader": "0.13.1",
-      "webpack": "1.13.2",
-      "webpack-dev-middleware": "1.8.4",
-      "webpack-hot-middleware": "2.13.0",
-      "webpack-md5-hash": "0.0.5"
-    }
-  }
-  ```
+```
+
   now to run this script we run this in the command line:
 
   ```
@@ -974,57 +894,12 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
   then we write an npm script to run it before our app runs, this is done with the prefix "pre", there is also a "post" prefix, these are called hooks, 
   observe the script section of the package.json:
 
-  ```
-  {
-    "name": "javascript-development-environment",
-    "version": "1.0.0",
-    "description": "JavaScript development environment Pluralsight course by Cory House",
+```
     "scripts": {
       "prestart": "node buildScripts/startMessage.js",
       "start": "node buildScripts/srcServer.js"
     },
-    "author": "Cory House",
-    "license": "MIT",
-    "dependencies": {
-      "whatwg-fetch": "1.0.0"
-    },
-    "devDependencies": {
-      "babel-cli": "6.16.0",
-      "babel-core": "6.17.0",
-      "babel-loader": "6.2.5",
-      "babel-preset-latest": "6.16.0",
-      "babel-register": "6.16.3",
-      "chai": "3.5.0",
-      "chalk": "1.1.3",
-      "cheerio": "0.22.0",
-      "compression": "1.6.2",
-      "cross-env": "3.1.3",
-      "css-loader": "0.25.0",
-      "eslint": "3.8.1",
-      "eslint-plugin-import": "2.0.1",
-      "eslint-watch": "2.1.14",
-      "express": "4.14.0",
-      "extract-text-webpack-plugin": "1.0.1",
-      "html-webpack-plugin": "2.22.0",
-      "jsdom": "9.8.0",
-      "json-schema-faker": "0.3.6",
-      "json-server": "0.8.22",
-      "localtunnel": "1.8.1",
-      "mocha": "3.1.2",
-      "nock": "8.1.0",
-      "npm-run-all": "3.1.1",
-      "nsp": "2.6.2",
-      "numeral": "1.5.3",
-      "open": "0.0.5",
-      "rimraf": "2.5.4",
-      "style-loader": "0.13.1",
-      "webpack": "1.13.2",
-      "webpack-dev-middleware": "1.8.4",
-      "webpack-hot-middleware": "2.13.0",
-      "webpack-md5-hash": "0.0.5"
-    }
-  }
-  ```
+```
 
   the script "prestart" will run before the "start" script, to see this in action run this command:
 
@@ -1034,59 +909,15 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
 
 01. ) Creating a script that runs the security check in parallel to the start script when the app starts, observe the "script section":
 
-  ```
-  {
-    "name": "javascript-development-environment",
-    "version": "1.0.0",
-    "description": "JavaScript development environment Pluralsight course by Cory House",
+```
     "scripts": {
       "prestart": "node buildScripts/startMessage.js",
       "start": "npm-run-all --parallel security-check open:src",
       "open:src": "node buildScripts/srcServer.js",
       "security-check": "nsp check"
     },
-    "author": "Cory House",
-    "license": "MIT",
-    "dependencies": {
-      "whatwg-fetch": "1.0.0"
-    },
-    "devDependencies": {
-      "babel-cli": "6.16.0",
-      "babel-core": "6.17.0",
-      "babel-loader": "6.2.5",
-      "babel-preset-latest": "6.16.0",
-      "babel-register": "6.16.3",
-      "chai": "3.5.0",
-      "chalk": "1.1.3",
-      "cheerio": "0.22.0",
-      "compression": "1.6.2",
-      "cross-env": "3.1.3",
-      "css-loader": "0.25.0",
-      "eslint": "3.8.1",
-      "eslint-plugin-import": "2.0.1",
-      "eslint-watch": "2.1.14",
-      "express": "4.14.0",
-      "extract-text-webpack-plugin": "1.0.1",
-      "html-webpack-plugin": "2.22.0",
-      "jsdom": "9.8.0",
-      "json-schema-faker": "0.3.6",
-      "json-server": "0.8.22",
-      "localtunnel": "1.8.1",
-      "mocha": "3.1.2",
-      "nock": "8.1.0",
-      "npm-run-all": "3.1.1",
-      "nsp": "2.6.2",
-      "numeral": "1.5.3",
-      "open": "0.0.5",
-      "rimraf": "2.5.4",
-      "style-loader": "0.13.1",
-      "webpack": "1.13.2",
-      "webpack-dev-middleware": "1.8.4",
-      "webpack-hot-middleware": "2.13.0",
-      "webpack-md5-hash": "0.0.5"
-    }
-  }
-  ```
+```
+
 
   If you get too much info in the console, use:
 
@@ -1098,11 +929,7 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
 
 01. ) Creating a script that runs localtunnel in parallel to the start script when the app starts, observe the "script section":
 
-  ```
-  {
-    "name": "javascript-development-environment",
-    "version": "1.0.0",
-    "description": "JavaScript development environment Pluralsight course by Cory House",
+```
     "scripts": {
       "prestart": "node buildScripts/startMessage.js",
       "start": "npm-run-all --parallel security-check open:src",
@@ -1111,210 +938,135 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
       "localtunnel": "lt --port 3000",
       "share": "npm-run-all --parallel open:src localtunnel"
     },
-    "author": "Cory House",
-    "license": "MIT",
-    "dependencies": {
-      "whatwg-fetch": "1.0.0"
-    },
-    "devDependencies": {
-      "babel-cli": "6.16.0",
-      "babel-core": "6.17.0",
-      "babel-loader": "6.2.5",
-      "babel-preset-latest": "6.16.0",
-      "babel-register": "6.16.3",
-      "chai": "3.5.0",
-      "chalk": "1.1.3",
-      "cheerio": "0.22.0",
-      "compression": "1.6.2",
-      "cross-env": "3.1.3",
-      "css-loader": "0.25.0",
-      "eslint": "3.8.1",
-      "eslint-plugin-import": "2.0.1",
-      "eslint-watch": "2.1.14",
-      "express": "4.14.0",
-      "extract-text-webpack-plugin": "1.0.1",
-      "html-webpack-plugin": "2.22.0",
-      "jsdom": "9.8.0",
-      "json-schema-faker": "0.3.6",
-      "json-server": "0.8.22",
-      "localtunnel": "1.8.1",
-      "mocha": "3.1.2",
-      "nock": "8.1.0",
-      "npm-run-all": "3.1.1",
-      "nsp": "2.6.2",
-      "numeral": "1.5.3",
-      "open": "0.0.5",
-      "rimraf": "2.5.4",
-      "style-loader": "0.13.1",
-      "webpack": "1.13.2",
-      "webpack-dev-middleware": "1.8.4",
-      "webpack-hot-middleware": "2.13.0",
-      "webpack-md5-hash": "0.0.5"
-    }
-  }
-  ```
+```
 
-  This way we avoided opening two terminals at the same time like we did before when setting up localtunnel.
+This way we avoided opening two terminals at the same time like we did before when setting up localtunnel, we just run:
 
-> **_//==============================================================\\_**
->
-> **_TRANSPILING - BABEL_**
->
-> **_\\==============================================================//_**
+```
+npm run share
+```
+01. ) Creating a script that runs our app with the webpack-dev-server, observe the "script section":
 
-Transpiling means changing ES6 code (ES2015) into ES5 to ensure our JS code runs in the browsers that do not yet fully support the latest version of JS, we will now be 
-using ES5 and Babel will transpile our code to ES5, we already installed Babel when we first ran "npm install" it is one of the many packages
-included in our package.json, so we just have to configure it:
-
-To configure babel:
-
-01. ) Creating a .babelrc file in our root, then put this code in that file and save it:
-
-  ```
-  {
-  "presets": [
-    "latest"
-    ]
-  }
-  ```
-
-  here we are saying we want to use all the latest JS features, this is all it takes to have babel transpile our code.
-
-  to test this:
-   
-01. ) Change our code from the current CommonJS module to ES6, lets start with the startMessage.js file, we will change it as follows:
-
-    
-    ```
-    import chalk from 'chalk';
-
-    console.log(chalk.green('Starting app in dev mode...'));
-    ```
-
-    Now to run this new ES6 code we have to change our npm script in the package.json to use babel to transpile the code before running it, 
-    to do this we have to use the command "babel-node" instande of "node", so our package.json becomes:
-
-    Observe the "prestart" script.
-
-    ```
-    {
-      "name": "javascript-development-environment",
-      "version": "1.0.0",
-      "description": "JavaScript development environment Pluralsight course by Cory House",
-      "scripts": {
-        "prestart": "babel-node buildScripts/startMessage.js",
-        "start": "npm-run-all --parallel security-check open:src",
-        "open:src": "node buildScripts/srcServer.js",
-        "security-check": "nsp check",
-        "localtunnel": "lt --port 3000",
-        "share": "npm-run-all --parallel open:src localtunnel"
-      },
-      "author": "Cory House",
-      "license": "MIT",
-      "dependencies": {
-        "whatwg-fetch": "1.0.0"
-      },
-      "devDependencies": {
-        "babel-cli": "6.16.0",
-        "babel-core": "6.17.0",
-        "babel-loader": "6.2.5",
-        "babel-preset-latest": "6.16.0",
-        "babel-register": "6.16.3",
-        "chai": "3.5.0",
-        "chalk": "1.1.3",
-        "cheerio": "0.22.0",
-        "compression": "1.6.2",
-        "cross-env": "3.1.3",
-        "css-loader": "0.25.0",
-        "eslint": "3.8.1",
-        "eslint-plugin-import": "2.0.1",
-        "eslint-watch": "2.1.14",
-        "express": "4.14.0",
-        "extract-text-webpack-plugin": "1.0.1",
-        "html-webpack-plugin": "2.22.0",
-        "jsdom": "9.8.0",
-        "json-schema-faker": "0.3.6",
-        "json-server": "0.8.22",
-        "localtunnel": "1.8.1",
-        "mocha": "3.1.2",
-        "nock": "8.1.0",
-        "npm-run-all": "3.1.1",
-        "nsp": "2.6.2",
-        "numeral": "1.5.3",
-        "open": "0.0.5",
-        "rimraf": "2.5.4",
-        "style-loader": "0.13.1",
-        "webpack": "1.13.2",
-        "webpack-dev-middleware": "1.8.4",
-        "webpack-hot-middleware": "2.13.0",
-        "webpack-md5-hash": "0.0.5"
-      }
-    }
-    ```
-
-    If the app runs it means we have configured babel correctly and it is transpiling the ES6 code.
-
-  > Note: If you keep getting errors attempt to install babel-cli globally by running the command: "npm install -g babel-cli"
-
-01. ) Lets change all our node commands to use babel, by changing the npm scripts in the package.json file we will set our app up to use babel and ES6, observe 
-  the changes in the scripts sections:
-
-  ```
-  {
-    "name": "javascript-development-environment",
-    "version": "1.0.0",
-    "description": "JavaScript development environment Pluralsight course by Cory House",
+```
     "scripts": {
-      "prestart": "babel-node buildScripts/startMessage.js",
+      "prestart": "node buildScripts/startMessage.js",
       "start": "npm-run-all --parallel security-check open:src",
-      "open:src": "babel-node buildScripts/srcServer.js",
+      "open:src": "node buildScripts/srcServer.js",
       "security-check": "nsp check",
       "localtunnel": "lt --port 3000",
-      "share": "npm-run-all --parallel open:src localtunnel"
+      "share": "npm-run-all --parallel open:src localtunnel",
+      "serve": "webpack-dev-server --config webpack.config.dev.js"
     },
-    "author": "Cory House",
-    "license": "MIT",
-    "dependencies": {
-      "whatwg-fetch": "1.0.0"
+```
+
+To run the script:
+
+```
+npm run serve
+```
+
+01. ) Creating a script that runs our app with the webpack-dev-server, observe the "script section":
+
+```
+    "scripts": {
+      "prestart": "node buildScripts/startMessage.js",
+      "start": "npm-run-all --parallel security-check open:src",
+      "open:src": "node buildScripts/srcServer.js",
+      "security-check": "nsp check",
+      "localtunnel": "lt --port 3000",
+      "share": "npm-run-all --parallel open:src localtunnel",
+      "clean": "rimraf build",
+      "serve": "webpack-dev-server --config webpack.config.dev.js"
     },
-    "devDependencies": {
-      "babel-cli": "^6.16.0",
-      "babel-core": "^6.17.0",
-      "babel-loader": "^6.2.5",
-      "babel-preset-latest": "^6.16.0",
-      "babel-register": "^6.16.3",
-      "chai": "3.5.0",
-      "chalk": "1.1.3",
-      "cheerio": "0.22.0",
-      "compression": "1.6.2",
-      "cross-env": "3.1.3",
-      "css-loader": "0.25.0",
-      "eslint": "3.8.1",
-      "eslint-plugin-import": "2.0.1",
-      "eslint-watch": "2.1.14",
-      "express": "4.14.0",
-      "extract-text-webpack-plugin": "1.0.1",
-      "html-webpack-plugin": "2.22.0",
-      "jsdom": "9.8.0",
-      "json-schema-faker": "0.3.6",
-      "json-server": "0.8.22",
-      "localtunnel": "1.8.1",
-      "mocha": "3.1.2",
-      "nock": "8.1.0",
-      "npm-run-all": "3.1.1",
-      "nsp": "2.6.2",
-      "numeral": "1.5.3",
-      "open": "0.0.5",
-      "rimraf": "2.5.4",
-      "style-loader": "0.13.1",
-      "webpack": "1.13.2",
-      "webpack-dev-middleware": "1.8.4",
-      "webpack-hot-middleware": "2.13.0",
-      "webpack-md5-hash": "0.0.5"
-    }
+```
+
+This script will delete all files in the build directory we use to compile our build files in.
+
+```
+npm run clean
+```
+
+01. ) Our final scripts section in our package.json should look like this:
+
+```
+{
+  "name": "react-redux-weback2-starter",
+  "version": "1.0.0",
+  "description": "Starter kit with React, Redux and Webpack2",
+  "scripts": {
+    "prestart": "babel-node buildScripts/startMessage.js",
+    "start": "npm-run-all --parallel security-check open:src",
+    "open:src": "babel-node buildScripts/srcServer.js",
+    "security-check": "nsp check",
+    "localtunnel": "lt --port 3000",
+    "share": "npm-run-all --parallel open:src localtunnel",
+    "clean": "rimraf build",
+    "serve": "webpack-dev-server"
+  },
+  "author": "Asim Abdelgadir",
+  "license": "MIT",
+  "dependencies": {
+    "babel-polyfill": "6.8.0",
+    "bootstrap": "3.3.6",
+    "jquery": "2.2.3",
+    "numeral": "^2.0.4",
+    "react": "15.0.2",
+    "react-dom": "15.0.2",
+    "react-redux": "4.4.5",
+    "react-router": "2.4.0",
+    "react-router-redux": "4.0.4",
+    "redux": "3.5.2",
+    "redux-thunk": "2.0.1",
+    "toastr": "2.1.2"
+  },
+  "devDependencies": {
+    "babel-cli": "6.8.0",
+    "babel-core": "6.8.0",
+    "babel-loader": "6.2.4",
+    "babel-plugin-react-display-name": "2.0.0",
+    "babel-preset-es2015": "6.6.0",
+    "babel-preset-react": "6.5.0",
+    "babel-preset-react-hmre": "1.1.1",
+    "babel-register": "6.8.0",
+    "cheerio": "0.22.0",
+    "colors": "1.1.2",
+    "compression": "1.6.1",
+    "cross-env": "1.0.7",
+    "css-loader": "^0.23.1",
+    "enzyme": "2.2.0",
+    "eslint": "2.9.0",
+    "eslint-plugin-import": "1.6.1",
+    "eslint-plugin-react": "5.0.1",
+    "eslint-watch": "2.1.11",
+    "eventsource-polyfill": "0.9.6",
+    "expect": "1.19.0",
+    "express": "4.13.4",
+    "extract-text-webpack-plugin": "1.0.1",
+    "file-loader": "0.8.5",
+    "html-webpack-plugin": "^2.28.0",
+    "image-webpack-loader": "^3.2.0",
+    "jsdom": "8.5.0",
+    "localtunnel": "^1.8.2",
+    "mocha": "2.4.5",
+    "nock": "8.0.0",
+    "npm-run-all": "1.8.0",
+    "nsp": "^2.6.2",
+    "open": "0.0.5",
+    "react-addons-test-utils": "15.0.2",
+    "redux-immutable-state-invariant": "1.2.3",
+    "redux-mock-store": "1.0.2",
+    "rimraf": "^2.5.2",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^2.2.1",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-dev-server": "^2.4.1",
+    "webpack-hot-middleware": "^2.10.0",
+    "webpack-md5-hash": "^0.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zonender/react-redux-weback2-starter"
   }
-  ```
-
-
-  
-
+}
+```
