@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 
 //our app third party dependencies
@@ -9,6 +10,7 @@ const VENDOR_LIBS = [
 ];
 
 const config = {
+  devtool: 'source-map',
   entry: {
     bundle: './src/index.js',
     vendor: VENDOR_LIBS
@@ -27,7 +29,7 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        loader:  ExtractTextPlugin.extract({loader: 'css-loader?importLoaders=1'})
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/,
@@ -42,6 +44,11 @@ const config = {
     ]
   },
   plugins: [
+      // this will grap any css file produced by the css-loader and insert it into the style.css file
+      new ExtractTextPlugin({
+      filename: '[name][chunkhash].css',
+      allChunks: true,
+      }),
       //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
       new webpack.optimize.CommonsChunkPlugin({
             names: ['vendor', 'manifest']

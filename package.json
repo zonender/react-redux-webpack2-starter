@@ -11,12 +11,13 @@
     "share": "npm-run-all --parallel open:src localtunnel",
     "clean": "rimraf build",
     "serve": "webpack-dev-server",
-    "lint": "esw webpack.config.* src buildScripts --color; exit 0",
+    "lint": "esw webpack.config.* src buildScripts --color",
     "lint:watch": "npm run lint -- --watch",
     "clean-dist": "rimraf ./dist && mkdir dist",
     "prebuild": "npm-run-all clean-dist lint",
     "build": "babel-node buildScripts/build.js",
-    "postbuild": "babel-node buildScripts/distServer.js"
+    "postbuild": "babel-node buildScripts/distServer.js",
+    "deploy": "surge ./dist"
   },
   "author": "Asim Abdelgadir",
   "license": "MIT",
@@ -74,6 +75,7 @@
     "redux-mock-store": "1.0.2",
     "rimraf": "^2.5.2",
     "style-loader": "^0.13.1",
+    "surge": "^0.18.0",
     "url-loader": "^0.5.7",
     "webpack": "^2.2.1",
     "webpack-dev-middleware": "^1.6.1",
