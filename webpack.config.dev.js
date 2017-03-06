@@ -1,8 +1,8 @@
-const webpack = require('webpack');
-const path = require('path');
-const htmlWebpackPlugin = require('html-webpack-plugin');
+import webpack from 'webpack';
+import path from 'path';
+import htmlWebpackPlugin from 'html-webpack-plugin';
 
-const config = {
+export default {
   //The entry point for the bundle.
   entry: {
     bundle: path.resolve(__dirname, 'src/index')
@@ -49,5 +49,3 @@ const config = {
       })
   ]
 };
-
-module.exports = config;
