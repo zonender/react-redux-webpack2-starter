@@ -1,23 +1,32 @@
-import webpack from 'webpack';
-import path from 'path';
-import htmlWebpackPlugin from 'html-webpack-plugin';
+const webpack = require('webpack');
+const path = require('path');
+const htmlWebpackPlugin = require('html-webpack-plugin');
 
-export default {
+const config = {
   //The entry point for the bundle.
+  watch: true,
+  devtool: 'cheap-module-eval-source-map',
   entry: {
-    bundle: path.resolve(__dirname, 'src/index')
+    //hot reloading
+    bundle: ['eventsource-polyfill', 'webpack-hot-middleware/client?reload=true', path.resolve(__dirname, 'src/index')]
+    //without hot reloading
+    // bundle: path.resolve(__dirname, 'src/index')
   },
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: 'bundle.js'
   },
   module: {
     rules: [
       {
-        use: 'babel-loader', //here we are selecting the loader
-        test: /\.js$/, //and here we specify which file the loader will process
+        use: ['babel-loader'], //here we are selecting the loader
+        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
         exclude: /node_modules/
+      },
+      {
+        test: /\.html$/,
+        use: "raw-loader"
       },
       {
         test: /\.css$/,
@@ -35,6 +44,9 @@ export default {
     ]
   },
   plugins: [
+      //hr
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoEmitOnErrorsPlugin(),
       //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
       new htmlWebpackPlugin({
             template: 'src/index.html' //if we do not specifiy a template, it will use the default one
@@ -49,3 +61,5 @@ export default {
       })
   ]
 };
+
+module.exports = config;

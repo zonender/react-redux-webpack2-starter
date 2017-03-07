@@ -1,7 +1,7 @@
-import webpack from 'webpack';
-import path from 'path';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
-import htmlWebpackPlugin from 'html-webpack-plugin';
+const webpack = require('webpack');
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const htmlWebpackPlugin = require('html-webpack-plugin');
 
 //our app third party dependencies
 const VENDOR_LIBS = [
@@ -9,7 +9,7 @@ const VENDOR_LIBS = [
       'react-router', 'react-router-redux', 'redux', 'redux-thunk', 'toastr'
 ];
 
-export default {
+const config = {
   devtool: 'source-map',
   entry: {
     bundle: './src/index.js',
@@ -24,7 +24,7 @@ export default {
     rules: [
       {
         use: 'babel-loader', //here we are selecting the loader
-        test: /\.js$/, //and here we specify which file the loader will process
+        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
         exclude: /node_modules/
       },
       {
@@ -62,3 +62,5 @@ export default {
       })
     ]
 };
+
+module.exports = config;

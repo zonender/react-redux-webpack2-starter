@@ -28,6 +28,14 @@
 
 * Version control: Git version: 2.11.1 (64-bit) and <www.github.com>
 
+* Awesome references:
+
+  - http://javascriptplayground.com/blog/2016/10/moving-to-webpack-2/
+  - For more on the configuration of webpack 2: https://github.com/webpack/docs/wiki/configuration
+  - For more on webpack's cli commands: https://webpack.github.io/docs/cli.html
+  - https://www.npmjs.com/package/@taion/extract-text-webpack-plugin
+
+
 > **_//==============================================================\\_**
 >
 > **_.GITIGNORE AND README.MD_**
@@ -417,7 +425,12 @@ To configure babel:
 
 ```
 {
-  "presets": ["react", "es2015"]
+  "presets": ["es2015", "react"],
+  "env": {
+    "development": {
+      "presets": ["react-hmre"]
+    }
+  }
 }
 ```
 
@@ -599,40 +612,33 @@ Now that we have a working app, we can now configure webpack.
     const path = require('path');
     const htmlWebpackPlugin = require('html-webpack-plugin');
 
-    //our app third party dependencies
-    const VENDOR_LIBS = [
-      'babel-polyfill', 'bootstrap', 'jquery', 'numeral', 'react', 'react-dom', 'react-redux',
-      'react-router', 'react-router-redux', 'redux', 'redux-thunk', 'toastr'
-    ];
-
     const config = {
       //The entry point for the bundle.
+      devtool: 'cheap-module-eval-source-map',
       entry: {
-        bundle: path.resolve(__dirname, 'src/index'),
-        vendor: VENDOR_LIBS
+        bundle: path.resolve(__dirname, 'src/index')
       },
       output: {
-        path: path.join(__dirname, 'build'),
+        path: path.join(__dirname, 'dist'),
         publicPath: '/',
-        filename: '[name][chunkhash].js'
+        filename: 'bundle.js'
       },
       module: {
         rules: [
           {
-            use: 'babel-loader', //here we are selecting the loader
-            test: /\.js$/, //and here we specify which file the loader will process
+            use: ['babel-loader'], //here we are selecting the loader
+            test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
             exclude: /node_modules/
           },
           {
             test: /\.css$/,
-            use: ['style-loader', 'css-loader'],
+            use: ['style-loader', 'css-loader']
           },
           {
             test: /\.(jpe?g|jpg|png|gif|svg)$/,
             use: [
               {
-                loader: 'url-loader',
-                options: { limit: 40000 }
+                loader: 'url-loader'
               },
               'image-webpack-loader'
             ]
@@ -640,27 +646,16 @@ Now that we have a working app, we can now configure webpack.
         ]
       },
       plugins: [
-          //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there 
-          //are it will remove them from bundle.js and put them in vendor.js
-          new webpack.optimize.CommonsChunkPlugin({
-                names: ['vendor', 'manifest']
-          }),
           //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
           new htmlWebpackPlugin({
                 template: 'src/index.html' //if we do not specifiy a template, it will use the default one
-          }),
-          //when reactjs runs it looks for this window scoped variable called process.env.NODE_ENV,
-          //if the value of this varaible is production react will not do too many error checking procedures,
-          //which also takes too long to run.
-          new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
           }),
           new webpack.LoaderOptionsPlugin({
             options: {
                 noInfo: false,
                 debug: true,
                 devtool: 'inline-source-map',
-                target: 'web',
+                target: 'web'
             }
           })
       ]
@@ -783,6 +778,8 @@ Now that we have a working app, we can now configure webpack.
 
     will have webpack-dev-server assume you are using the default config file name: "webpack.config.js", which is not the case in our app, since our webpack config file is named: "webpack.config.dev.js", we can have several webpack config files if we need.
 
+    Note:
+    We also have the hot reloading feature already available, if you change index.html or index.js and save, the browser will automatically show the changes.
 
 > **_//==============================================================\\_**
 >
@@ -1531,7 +1528,7 @@ const config = {
     bundle: path.resolve(__dirname, 'src/index')
   },
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: 'bundle.js'
   },
@@ -1539,7 +1536,7 @@ const config = {
     rules: [
       {
         use: 'babel-loader', //here we are selecting the loader
-        test: /\.js$/, //and here we specify which file the loader will process
+        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
         exclude: /node_modules/
       },
       {
@@ -1589,7 +1586,7 @@ export default {
     bundle: path.resolve(__dirname, 'src/index')
   },
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: 'bundle.js'
   },
@@ -1597,7 +1594,7 @@ export default {
     rules: [
       {
         use: 'babel-loader', //here we are selecting the loader
-        test: /\.js$/, //and here we specify which file the loader will process
+        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
         exclude: /node_modules/
       },
       {
@@ -1661,7 +1658,7 @@ const config = {
     rules: [
       {
         use: 'babel-loader', //here we are selecting the loader
-        test: /\.js$/, //and here we specify which file the loader will process
+        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
         exclude: /node_modules/
       },
       {
@@ -1732,7 +1729,7 @@ export default {
     rules: [
       {
         use: 'babel-loader', //here we are selecting the loader
-        test: /\.js$/, //and here we specify which file the loader will process
+        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
         exclude: /node_modules/
       },
       {
@@ -1771,3 +1768,277 @@ export default {
     ]
 };
 ```
+
+> **_//==============================================================\\_**
+>
+> **_Webpack and hot reloading_**
+>
+> **_\\==============================================================//_**
+
+To use hot reloading out of the box with webpack dev server you will have to start the app using webpack-dev-server, in our case we use the following script:
+
+```
+npm run serve
+```
+
+and this is the definition of the underlying script in package.json:
+
+```
+"serve": "webpack-dev-server --open --config webpack.config.dev.js",
+```
+
+IMPORTANT NOTE: unfortunately your webpack.config files must be written in commonJS in order for webpack-dev-server to work, if you write them in ES6 you will get the following error:
+
+```
+$ webpack-dev-server --config webpack.config.dev.js
+C:\Users\acsaa\Desktop\Dev\react-redux-weback2-starter\webpack.config.dev.js:1
+(function (exports, require, module, __filename, __dirname) { import webpack from 'webpack';
+                                                              ^^^^^^
+SyntaxError: Unexpected token import
+    at Object.exports.runInThisContext (vm.js:73:16)
+    at Module._compile (module.js:543:28)
+    at Object.Module._extensions..js (module.js:580:10)
+    at Module.load (module.js:488:32)
+    at tryModuleLoad (module.js:447:12)
+    at Function.Module._load (module.js:439:3)
+    at Module.require (module.js:498:17)
+    at require (internal/module.js:20:19)
+    at requireConfig (C:\Users\acsaa\AppData\Roaming\npm\node_modules\webpack\bin\convert-argv.js:96:18)
+    at C:\Users\acsaa\AppData\Roaming\npm\node_modules\webpack\bin\convert-argv.js:109:17
+```
+
+Now you should be able to save content and see the changes on the broweser without reloading.
+
+> **_//==============================================================\\_**
+>
+> **_Configuring Express with Webpack and hot reloading_**
+>
+> **_\\==============================================================//_**
+
+To acheive this we must add the following lines to our buildScripts/srcServer.js file:
+
+```
+import express from 'express';
+import path from 'path';
+import open from 'open';
+import webpack from 'webpack';
+import config from '../webpack.config.dev';
+
+const port = 3000;
+const app = express();
+const compiler = webpack(config);
+
+//hot reloading
+app.use(require('webpack-dev-middleware')(compiler, {
+  noInfo: true,
+  publicPath: config.output.publicPath
+}));
+
+//hot reloading
+app.use(require('webpack-hot-middleware')(compiler));
+
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, '../src/index.html'));
+});
+
+app.listen(port, function(err) {
+  if (err) {
+    console.log(err);
+  } else {
+    open('http://localhost:' + port);
+  }
+});
+```
+
+We also have to edit our webpack,config file as follows:
+
+```
+const webpack = require('webpack');
+const path = require('path');
+const htmlWebpackPlugin = require('html-webpack-plugin');
+
+const config = {
+  //The entry point for the bundle.
+  devtool: 'cheap-module-eval-source-map',
+  entry: {
+    //hot reloading
+    bundle: ['eventsource-polyfill', 'webpack-hot-middleware/client?reload=true', path.resolve(__dirname, 'src/index')]
+    //without hot reloading
+    // bundle: path.resolve(__dirname, 'src/index')
+  },
+  output: {
+    path: path.join(__dirname, 'dist'),
+    publicPath: '/',
+    filename: 'bundle.js'
+  },
+  module: {
+    rules: [
+      {
+        use: ['babel-loader'], //here we are selecting the loader
+        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
+        exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.(jpe?g|jpg|png|gif|svg)$/,
+        use: [
+          {
+            loader: 'url-loader'
+          },
+          'image-webpack-loader'
+        ]
+      }
+    ]
+  },
+  plugins: [
+      //hot reloading
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoEmitOnErrorsPlugin(),
+      //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
+      new htmlWebpackPlugin({
+            template: 'src/index.html' //if we do not specifiy a template, it will use the default one
+      }),
+      new webpack.LoaderOptionsPlugin({
+        options: {
+            noInfo: false,
+            debug: true,
+            devtool: 'inline-source-map',
+            target: 'web'
+        }
+      })
+  ]
+};
+
+module.exports = config;
+```
+
+> **_//==============================================================\\_**
+>
+> **_Configuring Express with Webpack and hot reloading for html files_**
+>
+> **_\\==============================================================//_**
+
+You may have noticed that when changes are saved to our index.html hot reloading does not work, to have hot reloading available to all our html files, follow these two steps:
+
+01. ) We already installed raw-loader under our dev dependencies, if it is not installed run:
+
+```
+npm install raw-loader --save-dev
+```
+
+01. ) Add the loader to our webpack.config.dev.js file by adding these lines:
+
+```
+      {
+        test: /\.html$/,
+        use: "raw-loader"
+      },
+```
+
+So our webpack.config.dev.js becomes:
+
+```
+const webpack = require('webpack');
+const path = require('path');
+const htmlWebpackPlugin = require('html-webpack-plugin');
+
+const config = {
+  //The entry point for the bundle.
+  watch: true,
+  devtool: 'cheap-module-eval-source-map',
+  entry: {
+    //hot reloading
+    bundle: ['eventsource-polyfill', 'webpack-hot-middleware/client?reload=true', path.resolve(__dirname, 'src/index')]
+    //without hot reloading
+    // bundle: path.resolve(__dirname, 'src/index')
+  },
+  output: {
+    path: path.join(__dirname, 'dist'),
+    publicPath: '/',
+    filename: 'bundle.js'
+  },
+  module: {
+    rules: [
+      {
+        use: ['babel-loader'], //here we are selecting the loader
+        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
+        exclude: /node_modules/
+      },
+      {
+        test: /\.html$/,
+        use: "raw-loader"
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.(jpe?g|jpg|png|gif|svg)$/,
+        use: [
+          {
+            loader: 'url-loader'
+          },
+          'image-webpack-loader'
+        ]
+      }
+    ]
+  },
+  plugins: [
+      //hr
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoEmitOnErrorsPlugin(),
+      //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
+      new htmlWebpackPlugin({
+            template: 'src/index.html' //if we do not specifiy a template, it will use the default one
+      }),
+      new webpack.LoaderOptionsPlugin({
+        options: {
+            noInfo: false,
+            debug: true,
+            devtool: 'inline-source-map',
+            target: 'web'
+        }
+      })
+  ]
+};
+
+module.exports = config;
+```
+
+01. ) Import our index.html in ou entry point file: index.js as follows:
+
+```
+import indexhtml from './index.html';
+```
+
+So our index.js file becomes:
+
+```
+/* global System */ //this is for eslint to allow the use of System.import
+import indexhtml from './index.html';
+import talk from './talkToConsole';
+console.log(talk(1, 2));
+
+const button = document.createElement('button');
+button.innerText = 'Click Me To Display Images';
+button.onclick = () => {
+    System.import('./image_viewer').then(module => {
+        module.default();
+    });
+};
+
+document.body.appendChild(button);
+```
+
+Now run the app:
+
+```
+npm start -s
+```
+
+Save some changes to index.html and observe, the changes are automatically reflected without reloading the browser.
+
+Reference: http://stackoverflow.com/questions/33183931/how-to-watch-index-html-using-webpack-dev-server-and-html-webpack-plugin
