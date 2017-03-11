@@ -2532,7 +2532,7 @@ class CoursesPage extends React.Component {
 export default CoursesPage;
 ```
 
-01. ) Lets create the functions this.onTitleChange:
+01. ) Lets create the function this.onTitleChange:
 
 ```
 onTitleChange(event) {
@@ -2637,8 +2637,6 @@ class CoursesPage extends React.Component {
 
 export default CoursesPage;
 ```
-
-01. ) Now lets bind the data:
 
 Running the app now will through the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
 
@@ -2755,30 +2753,6 @@ under the constructor of the component class.
 
 Now run the app, and you should get a popup message containing the text you entered.
 
-> **_//==============================================================\\_**
->
-> **_Creating our first action for Redux_**
->
-> **_\\==============================================================//_**
 
-We now have a form that is ready to send data, lets wire it up to Redux.
-
-01. ) Create a folder to keep our Redux related files called src/actions:
-
-in the folder create the file src/actions/courseActions.js this file will hold our course related action creators.
-
-01. ) Create the first action creator called createCourse by adding this code in the src/actions/courseActions.js file:
-
-```
-export function createCourse(course) {
-  return { type: 'CREATE_COURSE', course }
-}
-```
-
-> **_//==============================================================\\_**
->
-> **_Creating our first reducer for Redux_**
->
-> **_\\==============================================================//_**
 
 
