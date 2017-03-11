@@ -2639,15 +2639,9 @@ We will demonstrate the first use of redux by adding a new course, to do that we
     export default CoursesPage;
     ```
 
-<<<<<<< HEAD
-    Running the app now will through the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
-=======
-01. ) Now lets bind the data:
+    Running the app now will throw the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
 
-Running the app now will through the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
->>>>>>> parent of 1c4c8b9... "Error"
-
-    Because the "this" keyword in the line: "const course = this.state.course;" in the function: "onTitleChange"
+    Because the "this" keyword in the line: "const course = this.state.course;" in the function: "onTitleChange":
 
     ```
       onTitleChange(event) {
@@ -2664,6 +2658,8 @@ Running the app now will through the following error: "Uncaught TypeError: Canno
     binding our selves.
 
     To fix this, lets bind the "this" context up in the constructor in the CoursesPage class, so we will add the following bind statements:
+
+01. ) Now lets bind the data:
 
     ```
     this.onTitleChange = this.onTitleChange.bind(this);
@@ -2832,7 +2828,7 @@ is just a function that accepts a state and an action and then returns a new sta
 
 > **_//==============================================================\\_**
 >
-> **_Creating our first root reducer for Redux_**
+> **_Creating a root reducer_**
 >
 > **_\\==============================================================//_**
 
@@ -2850,5 +2846,124 @@ reducer.
     });
 
     export default rootReducer;
+    ```
+
+> **_//==============================================================\\_**
+>
+> **_Creating the store and instantiating the store and the provider_**
+>
+> **_\\==============================================================//_**
+
+In redux there is only one store.
+
+01. ) Create a folder called src/store
+
+01. ) In the src/store folder create the file src/store/configureStore.js, now we can configure our redux store by adding the following code in it:
+
+    ```
+    import {createStore} from 'redux';
+    import rootReducer from '../reducers';
+
+    export default function configureStore(initialState) {
+      return createStore(rootReducer, initialState);
+    }
+    ```
+
+01. ) To enhance our store we will also add middleware:
+
+    ```
+    import {createStore, applyMiddleware} from 'redux';
+    import rootReducer from '../reducers';
+    import reduxImmutableStateInvariant from 'redux-immutable-state-invariant';
+
+    export default function configureStore(initialState) {
+      return createStore(
+        rootReducer, 
+        initialState,
+        applyMiddleware(reduxImmutableStateInvariant())
+        );
+    }
+    ```
+
+01. ) Update our app entry point to work with redux, open the file src/index.js:
+
+    ```
+    import configureStore from './store/configureStore';
+
+    const store = configureStore();
+    ```
+
+    So the file should look like:
+
+    ```
+    // /* global System */ //this is for eslint to allow the use of System.import
+    import indexhtml from './index.html';
+    import talk from './talkToConsole';
+    console.log(talk(1, 2));
+
+    const button = document.createElement('button');
+    button.innerText = 'Click Me To Display Images';
+    button.onclick = () => {
+        System.import('./image_viewer').then(module => {
+            module.default();
+        });
+    };
+
+    document.body.appendChild(button);
+
+    import 'babel-polyfill';
+    import React from 'react';
+    import { render } from 'react-dom';
+    import { Router, browserHistory } from 'react-router';
+    import routes from './routes';
+    import './styles/style.css';
+    import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+    import configureStore from './store/configureStore';
+
+    const store = configureStore();
+
+    render(
+      <Router history={browserHistory} routes={routes} />,
+      document.getElementById('app')
+    );
+    ```
+
+01. ) We now have a configured instance of a store that we have set to a constant, to use it we need a companion library called "provider", it attaches the store to 
+    our react container components:
+
+    ```
+    // /* global System */ //this is for eslint to allow the use of System.import
+    import indexhtml from './index.html';
+    import talk from './talkToConsole';
+    console.log(talk(1, 2));
+
+    const button = document.createElement('button');
+    button.innerText = 'Click Me To Display Images';
+    button.onclick = () => {
+        System.import('./image_viewer').then(module => {
+            module.default();
+        });
+    };
+
+    document.body.appendChild(button);
+
+    import 'babel-polyfill';
+    import React from 'react';
+    import { render } from 'react-dom';
+    import { Router, browserHistory } from 'react-router';
+    import routes from './routes';
+    import './styles/style.css';
+    import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+    import configureStore from './store/configureStore';
+    import {provider} from 'react-redux';
+
+    const store = configureStore();
+
+    render(
+      <Provider store={store}>
+        <Router history={browserHistory} routes={routes} />
+      </Provider>,
+      document.getElementById('app')
+    );
     ```
 
