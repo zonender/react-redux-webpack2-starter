@@ -2532,7 +2532,7 @@ We will demonstrate the first use of redux by adding a new course, to do that we
     export default CoursesPage;
     ```
 
-01. ) Lets create the function this.onTitleChange:
+01. ) Lets create the functions this.onTitleChange:
 
     ```
     onTitleChange(event) {
@@ -2639,7 +2639,13 @@ We will demonstrate the first use of redux by adding a new course, to do that we
     export default CoursesPage;
     ```
 
+<<<<<<< HEAD
     Running the app now will through the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
+=======
+01. ) Now lets bind the data:
+
+Running the app now will through the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
+>>>>>>> parent of 1c4c8b9... "Error"
 
     Because the "this" keyword in the line: "const course = this.state.course;" in the function: "onTitleChange"
 
@@ -2824,14 +2830,25 @@ is just a function that accepts a state and an action and then returns a new sta
      state array, then I can use Object to create a deep copy of the course that is passed in, this way these two values together end up returning a new state that contains a new course
      that someone has just passed in via the action.
 
+> **_//==============================================================\\_**
+>
+> **_Creating our first root reducer for Redux_**
+>
+> **_\\==============================================================//_**
 
+Redux supports multiple reducers and most apps will be using more than one reducer and hence the need for a rootReducer, we will only need a root reducer when we use more than one
+reducer.
 
+01. ) Create a new file called src/reducers/index.js, in it add the following code:
 
+    ```
+    import {combineReducers} from 'redux';
+    import courses from './courseReducer';
 
+    const rootReducer = combineReducers({
+      courses //this is called a shorthand property name
+    });
 
-
-
-
-    
-
+    export default rootReducer;
+    ```
 
