@@ -2445,314 +2445,393 @@ We will demonstrate the first use of redux by adding a new course, to do that we
 
 01. ) Add a constructor to initialize state for the form in the constructor, again for simplicity we will assume a course has only a title for now:
 
-```
-constructor(props, context) {
-  super(props, context);
+    ```
+    constructor(props, context) {
+      super(props, context);
 
-  this.state = {
-    course: { title: null }
-  };
-}
-```
+      this.state = {
+        course: { title: null }
+      };
+    }
+    ```
 
-So our src/components/course/CoursesPage.js becomes:
+    So our src/components/course/CoursesPage.js becomes:
 
-```
-import React, {PropTypes} from 'react';
+    ```
+    import React, {PropTypes} from 'react';
 
-class CoursesPage extends React.Component {
-  constructor(props, context) {
-    super(props, context);
+    class CoursesPage extends React.Component {
+      constructor(props, context) {
+        super(props, context);
 
-    this.state = {
-    course: { title: null }
-    };
-  }
+        this.state = {
+        course: { title: null }
+        };
+      }
 
-  render() {
-    return (
-      <div>
-        <h1>Courses</h1>
-      </div>
-    );
-  }
-}
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+          </div>
+        );
+      }
+    }
 
-export default CoursesPage;
-```
+    export default CoursesPage;
+    ```
 
 01. ) Lets add the form to the page by adding this html to the render function:
 
-```
-<h2>Add Course</h2>
-<input
-  type="text"
-  onChange={this.onTitleChange}
-  value={this.state.course.title} />
+    ```
+    <h2>Add Course</h2>
+    <input
+      type="text"
+      onChange={this.onTitleChange}
+      value={this.state.course.title} />
 
-<input
-  type="submit"
-  value="Save"
-  onClick={this.onClickSave} />
-``` 
+    <input
+      type="submit"
+      value="Save"
+      onClick={this.onClickSave} />
+    ``` 
 
-So our src/components/course/CoursesPage.js becomes:
+    So our src/components/course/CoursesPage.js becomes:
 
-```
-import React, {PropTypes} from 'react';
+    ```
+    import React, {PropTypes} from 'react';
 
-class CoursesPage extends React.Component {
-  constructor(props, context) {
-    super(props, context);
+    class CoursesPage extends React.Component {
+      constructor(props, context) {
+        super(props, context);
 
-    this.state = {
-    course: { title: null }
-    };
-  }
+        this.state = {
+        course: { title: null }
+        };
+      }
 
-  render() {
-    return (
-      <div>
-        <h1>Courses</h1>
-        <h2>Add Course</h2>
-        <input
-          type="text"
-          onChange={this.onTitleChange}
-          value={this.state.course.title} />
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+            <h2>Add Course</h2>
+            <input
+              type="text"
+              onChange={this.onTitleChange}
+              value={this.state.course.title} />
 
-        <input
-          type="submit"
-          value="Save"
-          onClick={this.onClickSave} />
-      </div>
-    );
-  }
-}
+            <input
+              type="submit"
+              value="Save"
+              onClick={this.onClickSave} />
+          </div>
+        );
+      }
+    }
 
-export default CoursesPage;
-```
+    export default CoursesPage;
+    ```
 
 01. ) Lets create the function this.onTitleChange:
 
-```
-onTitleChange(event) {
-  const course = this.state.course;
-  course.title = event.target.value;
-  this.setState({course: course});
-}
-```
+    ```
+    onTitleChange(event) {
+      const course = this.state.course;
+      course.title = event.target.value;
+      this.setState({course: course});
+    }
+    ```
 
-So our src/components/course/CoursesPage.js becomes:
+    So our src/components/course/CoursesPage.js becomes:
 
-```
-import React, {PropTypes} from 'react';
+    ```
+    import React, {PropTypes} from 'react';
 
-class CoursesPage extends React.Component {
-  constructor(props, context) {
-    super(props, context);
+    class CoursesPage extends React.Component {
+      constructor(props, context) {
+        super(props, context);
 
-    this.state = {
-    course: { title: "" } //setting this to null will raise an error, make sure you use an initial value with an empty string ""
-    };
-  }
+        this.state = {
+        course: { title: "" } //setting this to null will raise an error, make sure you use an initial value with 
+        //an empty string ""
+        };
+      }
 
-  onTitleChange(event) {
-  const course = this.state.course;
-  course.title = event.target.value;
-  this.setState({course: course});
-  }
+      onTitleChange(event) {
+      const course = this.state.course;
+      course.title = event.target.value;
+      this.setState({course: course});
+      }
 
-  render() {
-    return (
-      <div>
-        <h1>Courses</h1>
-        <h2>Add Course</h2>
-        <input
-          type="text"
-          onChange={this.onTitleChange}
-          value={this.state.course.title} />
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+            <h2>Add Course</h2>
+            <input
+              type="text"
+              onChange={this.onTitleChange}
+              value={this.state.course.title} />
 
-        <input
-          type="submit"
-          value="Save"
-          onClick={this.onClickSave} />
-      </div>
-    );
-  }
-}
+            <input
+              type="submit"
+              value="Save"
+              onClick={this.onClickSave} />
+          </div>
+        );
+      }
+    }
 
-export default CoursesPage;
-```
+    export default CoursesPage;
+    ```
 
 01. ) Lets create the function this.onClickSave:
 
-```
-onClickSave() {
-  alert(`Saving ${this.state.course.title}`);
-}
-```
+    ```
+    onClickSave() {
+      alert(`Saving ${this.state.course.title}`);
+    }
+    ```
 
-So our src/components/course/CoursesPage.js becomes:
+    So our src/components/course/CoursesPage.js becomes:
 
-```
-import React, {PropTypes} from 'react';
+    ```
+    import React, {PropTypes} from 'react';
 
-class CoursesPage extends React.Component {
-  constructor(props, context) {
-    super(props, context);
+    class CoursesPage extends React.Component {
+      constructor(props, context) {
+        super(props, context);
 
-    this.state = {
-    course: { title: null }
-    };
-  }
+        this.state = {
+        course: { title: null }
+        };
+      }
 
-  onTitleChange(event) {
-  const course = this.state.course;
-  course.title = event.target.value;
-  this.setState({course: course});
-  }
+      onTitleChange(event) {
+      const course = this.state.course;
+      course.title = event.target.value;
+      this.setState({course: course});
+      }
 
-  onClickSave() {
-  alert(`Saving ${this.state.course.title}`);
-  }
+      onClickSave() {
+      alert(`Saving ${this.state.course.title}`);
+      }
 
-  render() {
-    return (
-      <div>
-        <h1>Courses</h1>
-        <h2>Add Course</h2>
-        <input
-          type="text"
-          onChange={this.onTitleChange}
-          value={this.state.course.title} />
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+            <h2>Add Course</h2>
+            <input
+              type="text"
+              onChange={this.onTitleChange}
+              value={this.state.course.title} />
 
-        <input
-          type="submit"
-          value="Save"
-          onClick={this.onClickSave} />
-      </div>
-    );
-  }
-}
+            <input
+              type="submit"
+              value="Save"
+              onClick={this.onClickSave} />
+          </div>
+        );
+      }
+    }
 
-export default CoursesPage;
-```
+    export default CoursesPage;
+    ```
 
-Running the app now will through the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
+    Running the app now will through the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
 
-Because the "this" keyword in the line: "const course = this.state.course;" in the function: "onTitleChange"
+    Because the "this" keyword in the line: "const course = this.state.course;" in the function: "onTitleChange"
 
-```
-  onTitleChange(event) {
-  const course = this.state.course;
-  course.title = event.target.value;
-  this.setState({course: course});
-  }
-```
+    ```
+      onTitleChange(event) {
+      const course = this.state.course;
+      course.title = event.target.value;
+      this.setState({course: course});
+      }
+    ```
 
-actually referes to the function "onTitleChange" and not to the class "CoursesPage", so the this context is wrong in our change handler, the function is inheriting the "this" context
-from the caller, which in this case the caller is the "onTitleChange" function.
+    actually referes to the function "onTitleChange" and not to the class "CoursesPage", so the this context is wrong in our change handler, the function is inheriting the "this" context
+    from the caller, which in this case the caller is the "onTitleChange" function.
 
-When using react's create class function, functions are autobound for you and you don't have to use "bind", however, react doesn't autobind in ES6 classes so we have to handle
-binding our selves.
+    When using react's create class function, functions are autobound for you and you don't have to use "bind", however, react doesn't autobind in ES6 classes so we have to handle
+    binding our selves.
 
-To fix this, lets bind the "this" context up in the constructor in the CoursesPage class, so we will add the following bind statements:
+    To fix this, lets bind the "this" context up in the constructor in the CoursesPage class, so we will add the following bind statements:
 
-```
-this.onTitleChange = this.onTitleChange.bind(this);
-this.onClickSave = this.onClickSave.bind(this);
-```
-
-So our src/components/course/CoursesPage.js becomes:
-
-```
-import React, {PropTypes} from 'react';
-
-class CoursesPage extends React.Component {
-  constructor(props, context) {
-    super(props, context);
-
-    this.state = {
-    course: { title: "" } //setting this to null will raise an error, make sure you use an initial value with an empty string ""
-    };
-
+    ```
     this.onTitleChange = this.onTitleChange.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
-  }
+    ```
 
-  onTitleChange(event) {
-  const course = this.state.course;
-  course.title = event.target.value;
-  this.setState({course: course});
-  }
+    So our src/components/course/CoursesPage.js becomes:
 
-  onClickSave() {
-  alert(`Saving ${this.state.course.title}`);
-  }
+    ```
+    import React, {PropTypes} from 'react';
 
-  render() {
-    return (
-      <div>
-        <h1>Courses</h1>
-        <h2>Add Course</h2>
-        <input
-          type="text"
-          onChange={this.onTitleChange}
-          value={this.state.course.title} />
+    class CoursesPage extends React.Component {
+      constructor(props, context) {
+        super(props, context);
 
-        <input
-          type="submit"
-          value="Save"
-          onClick={this.onClickSave} />
-      </div>
-    );
-  }
-}
+        this.state = {
+        course: { title: "" } //setting this to null will raise an error, make sure you use an initial value with 
+        //an empty string ""
+        };
 
-export default CoursesPage;
-```
+        this.onTitleChange = this.onTitleChange.bind(this);
+        this.onClickSave = this.onClickSave.bind(this);
+      }
 
-for both functions, so now we have bound them to the "this" of the CoursesPage component.
+      onTitleChange(event) {
+      const course = this.state.course;
+      course.title = event.target.value;
+      this.setState({course: course});
+      }
 
-We can also do the bind under the render function like this:
+      onClickSave() {
+      alert(`Saving ${this.state.course.title}`);
+      }
 
-```
-onChange={this.onTitleChange.bind(this)}
-```
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+            <h2>Add Course</h2>
+            <input
+              type="text"
+              onChange={this.onTitleChange}
+              value={this.state.course.title} />
 
-and 
+            <input
+              type="submit"
+              value="Save"
+              onClick={this.onClickSave} />
+          </div>
+        );
+      }
+    }
 
-```
-onClick={this.onClickSave.bind(this)}
-```
+    export default CoursesPage;
+    ```
 
-under the render function:
+    for both functions, so now we have bound them to the "this" of the CoursesPage component.
 
-```
-  render() {
-    return (
-      <div>
-        <h1>Courses</h1>
-        <h2>Add Course</h2>
-        <input
-          type="text"
-          onChange={this.onTitleChange.bind(this)}
-          value={this.state.course.title} />
+    We can also do the bind under the render function like this:
 
-        <input
-          type="submit"
-          value="Save"
-          onClick={this.onClickSave.bind(this)} />
-      </div>
-    );
-  }
-```
+    ```
+    onChange={this.onTitleChange.bind(this)}
+    ```
 
-however, this will impact the performance, everytime you do a bind and render a new function will be created on each render, so always make sure to place your bind calls
-under the constructor of the component class.
+    and 
 
-Now run the app, and you should get a popup message containing the text you entered.
+    ```
+    onClick={this.onClickSave.bind(this)}
+    ```
+
+    under the render function:
+
+    ```
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+            <h2>Add Course</h2>
+            <input
+              type="text"
+              onChange={this.onTitleChange.bind(this)}
+              value={this.state.course.title} />
+
+            <input
+              type="submit"
+              value="Save"
+              onClick={this.onClickSave.bind(this)} />
+          </div>
+        );
+      }
+    ```
+
+    however, this will impact the performance, everytime you do a bind and render a new function will be created on each render, so always make sure to place your bind calls
+    under the constructor of the component class.
+
+    Now run the app, and you should get a popup message containing the text you entered.
+
+> **_//==============================================================\\_**
+>
+> **_Creating our first action for Redux_**
+>
+> **_\\==============================================================//_**
+
+We now have a form that is ready to send data, lets wire it up to Redux.
+
+01. ) Create a folder to keep our Redux related files called src/actions:
+
+    in the folder create the file src/actions/courseActions.js this file will hold our course related action creators.
+
+01. ) Create the first action creator called createCourse by adding this code in the src/actions/courseActions.js file:
+
+    ```
+    export function createCourse(course) {
+      return { type: 'CREATE_COURSE', course }
+    }
+    ```
+
+> **_//==============================================================\\_**
+>
+> **_Creating our first reducer for Redux_**
+>
+> **_\\==============================================================//_**
+
+Now that we created an action we need a function that will handle that action, and this is where reducers come into play, in Redux we handle actions with reducers, a reducer
+is just a function that accepts a state and an action and then returns a new state.
+
+01. ) Create a new directory called src/reducers.
+
+01. ) Create a new file called src/reducers/courseReducer.js and in it put the following code:
+
+    ```
+    export default function courseReducer(state = [], action) {
+      switch(action.type) {
+        case 'CREATE_COURSE':
+          return [...state,
+            Object.assign({}, action.course)
+          ];
+
+        default:
+          return state;
+      }
+    }
+    ```
+
+    The default state here: "state = []" has been set to an array because this reducer will handle our list of cources, and by setting this to an empty array, we are telling the reducer
+    we are starting out with no courses.
+
+    The switch statment will allow us to fork our logic based on the action we receive, specifically we will look at the action type, for now the only action we will handle is the
+    "CREATE_COURSE" action, everytime you use a switch statement it is a good idea to have a default, because we could have multiple reducers handling different actions, and if this
+    reducer isn't handling this specific action it should just return state.
+
+    Then we will return a new array:
+    
+    ```
+     return [...state,
+      Object.assign({}, action.course)
+    ];
+    ```
+
+     here we used the spread operator "...state" on our existing state and then we used "Object.assign" and pass it our target object which is an empty object in this case, then 
+     pass it the course that is passed on our action, finally close out the array.
+
+     THe ES6 spread operator spreads the array as if we took all the values in it and defined them here: "...state" inline, so this "...state" ends up returning a new instance of our 
+     state array, then I can use Object to create a deep copy of the course that is passed in, this way these two values together end up returning a new state that contains a new course
+     that someone has just passed in via the action.
 
 
+
+
+
+
+
+
+
+    
 
 
