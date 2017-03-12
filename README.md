@@ -2858,7 +2858,7 @@ In redux there is only one store.
 
 01. ) Create a folder called src/store
 
-01. ) In the src/store folder create the file src/store/configureStore.js, now we can configure our redux store by adding the following code in it:
+01. ) In the src/store folder create the file src/store/configureStore.js, now we can configure our redux store by adding the following code in it, when creating a store it is useful to define a function that configures the store, this way we can call this function in our application entry point, this way the store is configured when the app starts up:
 
     ```
     import {createStore} from 'redux';
@@ -2868,6 +2868,8 @@ In redux there is only one store.
       return createStore(rootReducer, initialState);
     }
     ```
+
+    And this is all it takes to configure our store, the configureStore function should accept one parameter which is the initialState, this is a good way to initialize your store with some state especially when we are doing server side rendering, we will not be covering server side rendering here.
 
 01. ) To enhance our store we will also add middleware:
 
@@ -2885,12 +2887,18 @@ In redux there is only one store.
     }
     ```
 
-01. ) Update our app entry point to work with redux, open the file src/index.js:
+01. ) Now that we have configured our configureStore function, we will put it to use in our application entry point, so here we will update our app entry point to work with redux, open the file src/index.js:
 
     ```
     import configureStore from './store/configureStore';
 
     const store = configureStore();
+    ```
+
+    If we were creating a server side redering app, we would also pass the initialState paramater to the configure store function like so:
+
+    ```
+    const store = configureStore(initialState);
     ```
 
     So the file should look like:
@@ -2935,6 +2943,16 @@ In redux there is only one store.
     // /* global System */ //this is for eslint to allow the use of System.import
     import indexhtml from './index.html';
     import talk from './talkToConsole';
+    import 'babel-polyfill';
+    import React from 'react';
+    import { render } from 'react-dom';
+    import { Router, browserHistory } from 'react-router';
+    import routes from './routes';
+    import './styles/style.css';
+    import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+    import configureStore from './store/configureStore';
+    import {provider} from 'react-redux';
+
     console.log(talk(1, 2));
 
     const button = document.createElement('button');
@@ -2947,16 +2965,6 @@ In redux there is only one store.
 
     document.body.appendChild(button);
 
-    import 'babel-polyfill';
-    import React from 'react';
-    import { render } from 'react-dom';
-    import { Router, browserHistory } from 'react-router';
-    import routes from './routes';
-    import './styles/style.css';
-    import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
-    import configureStore from './store/configureStore';
-    import {provider} from 'react-redux';
-
     const store = configureStore();
 
     render(
@@ -2967,3 +2975,204 @@ In redux there is only one store.
     );
     ```
 
+> **_//==============================================================\\_**
+>
+> **_Connecting the store to react container components and dispatching an action_**
+>
+> **_\\==============================================================//_**
+
+Most of the work we just did so far with redux is a one time setup, now we have all the redux infrastructure setup except for one remaining piece which is to update our 
+coursePage component to work with redux, to do that we need to reference the connect function, the connect function is what we use to create react components that 
+interact with redux, these are called container components.
+
+01. ) Open the file src/components/course/CoursesPage.js and add the following code:
+
+    ```
+    import {connect} from 'react-redux';
+    ```
+
+    Then, instead of exporting a plain component we are going to export the component that is decorated by the react-redux connect function, the connect function is what we use to create components that interact with redux, going forward we will call these components container components.
+
+    Instead of exporting the CoursesPage we will export the CoursesPage wrapped in a call to the connect function like this:
+
+    ```
+    export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+    ```
+
+    connect is a higher order component that is going to wrap our CoursesPage, connect takes two parameters, the fisrt mapStateToProps and the second mapDispatchToProps, each of these parameters are functions them selves.
+
+    Notice how we placed the two perantheses side by side:
+
+    ```
+    export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+    ```
+
+    these are just two function calls, the connect function is returning a function, and that function ends up calling our container component "CoursesPage" with the result of th efirst function, to clarify this here is an alternative setup:
+
+    ```
+    const connectedStateAndProps = connect(mapStateToProps, mapDispatchToProps);
+    export default connectedStateAndProps(CoursesPage);
+    ```
+
+    above we created an intermediate variable connectedStateAndProps, we called connect and passed it the parameters mapStateToProps and mapDispatchToProps and then we stored the result in connectedStateAndProps which is a function, then i can use that function "connectedStateAndProps" to call the CoursesPage.
+
+    The first function we passed into the connect function as a parameter is the mapStateToProps, lets define it here:
+
+    ```
+    function mapStateToProps(state, ownProps) {
+      return {
+        courses
+      };
+    }
+    ```
+
+    mapStateToProps takes two parameters, "state" and "ownProps", inside the function we will define an object that returns the properties we would like to see exposed in our component, so when I say: "courses" under the return object, then I am saying I would like to be able to access my courses by saying this.props.courses here on this component:
+
+    ```
+    render() {
+      return (
+        <div>
+          <h1>Courses</h1>
+          <h2>Add Course</h2>
+          <input
+            type="text"
+            onChange={this.onTitleChange}
+            value={this.state.course.title} />
+
+          <input
+            type="submit"
+            value="Save"
+            onClick={this.onClickSave} />
+        </div>
+      );
+    }
+    ```
+
+    now what we need to define is how to get that course data, the "state" parameter we passed in the mapStateToProps function represents the state that is within our redux store, to access this state will say: "courses: state.courses" like this:
+
+    ```
+    function mapStateToProps(state, ownProps) {
+      return {
+        courses: state.courses
+      };
+    }
+    ```
+
+    and now I am accessing the course data that is within our redux store, remember that this property here: "state.courses" under the return object is determined by the choice we made within our root reducer src/reducers/index.js.
+
+    The second parameter mapStateToProps takes is the "ownProps" parameter which lets us access the props that are being attached to this component, that is why it is called ownProps because it is a reference to the component's own props, in this case it will be most useful for accessing routing related props injected by react routers, we are not going to need that at this point so we will discuss it more later.
+
+    The second parameter passed to the connect function is mapDispatchToProps, this parameter is for deciding what actions you want to expose on your component, this is an optional parameter, so we can delete it for now. when we delete this parameter our component automatically gets a dispatch property attached to it and that is injected by connect, so if you don't put the mapDispatchToProps parameter in the connect function then you will be able to come up here in the component:
+
+    ```
+    render() {
+      return (
+        <div>
+          <h1>Courses</h1>
+          <h2>Add Course</h2>
+          <input
+            type="text"
+            onChange={this.onTitleChange}
+            value={this.state.course.title} />
+
+          <input
+            type="submit"
+            value="Save"
+            onClick={this.onClickSave} />
+        </div>
+      );
+    }
+    ```
+
+    and say this.props.dispatch, dispatch is a function that allows you to fire off your actions, so we will be able to dispatch defferent actions that we have defined in the 
+    src/actions/courseActions.js file, to be able to dispatch an action we need to go back to the top of the file CoursesPage.js because we need to create a reference to the createCourse action that we created earlier, so we will have to import it:
+
+    ```
+    import * as courseActions from '../../actions/courseActions';
+    ```
+
+    and that we have access to our createCourse action in our component we can now go ahead and update our onClickSave function by deleting the alert we placed earlier and add the following code:
+
+    ```
+    onClickSave() {
+      this.props.dispatch();
+    }
+    ```
+
+    so now we dispatched our first action, because as discussed earlier, since we didn't define a mapDispatchToProps function, the connect function is going to inject a dispatch prop for us, this is a function that we will need to call to be able to fire an action that redux will handle, now we need to pass it an action like this:
+
+    ```
+    onClickSave() {
+      this.props.dispatch(courseActions.createCourse());
+    }
+    ```    
+
+    and createCourse is going to need a reference to some data, so we will pass it this.state.course like this:
+
+    ```
+    onClickSave() {
+      this.props.dispatch(courseActions.createCourse(this.state.course));
+    }
+    ```    
+
+    This looks ugly and there is a more elegent way to dispatch an action.
+
+    So our file becomes:
+
+    ```
+    import React, {PropTypes} from 'react';
+    import {connect} from 'react-redux';
+    import * as courseActions from '../../actions/courseActions';
+
+    class CoursesPage extends React.Component {
+      constructor(props, context) {
+        super(props, context);
+
+        this.state = {
+        course: { title: "" } //setting this to null will raise an error, make sure you use an initial value with an empty string ""
+        };
+
+        this.onTitleChange = this.onTitleChange.bind(this);
+        this.onClickSave = this.onClickSave.bind(this);
+      }
+
+      onTitleChange(event) {
+      const course = this.state.course;
+      course.title = event.target.value;
+      this.setState({course: course});
+      }
+
+      onClickSave() {
+        // alert(`Saving ${this.state.course.title}`);
+        this.props.dispatch(courseActions.createCourse(this.state.course));
+      }
+
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+            <h2>Add Course</h2>
+            <input
+              type="text"
+              onChange={this.onTitleChange}
+              value={this.state.course.title} />
+
+            <input
+              type="submit"
+              value="Save"
+              onClick={this.onClickSave} />
+          </div>
+        );
+      }
+    }
+
+    function mapStateToProps(state, ownProps) {
+      return {
+        courses: state.courses
+      };
+    }
+
+    export default connect(mapStateToProps)(CoursesPage);
+    ```
+
+    
