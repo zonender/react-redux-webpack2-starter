@@ -1,8 +1,11 @@
-    import {combineReducers} from 'redux';
-    import courses from './courseReducer';
+import {combineReducers} from 'redux';
+import courses from './courseReducer';
+import {routerReducer} from 'react-router-redux';
 
-    const rootReducer = combineReducers({
-      courses //this is called a shorthand property name
-    });
+//"courses" is called a shorthand property name
+const rootReducer = combineReducers({
+  courses,
+  routing: routerReducer
+});
 
-    export default rootReducer;
+export default rootReducer;

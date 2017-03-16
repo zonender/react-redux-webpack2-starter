@@ -2443,7 +2443,7 @@ We will demonstrate the first use of redux by adding a new course, to do that we
  in which the course details are added, the best approach would be to create a separate component to hold our html, but for the sake of simplicity, we will
  add our form directly in our CoursePage component.
 
-01. ) Add a constructor to initialize state for the form in the constructor, again for simplicity we will assume a course has only a title for now:
+01. ) Open src/components/course/CoursesPage.js and add a constructor function to initialize state for the form in the constructor, again for simplicity we will assume a course has only a title for now:
 
     ```
     constructor(props, context) {
@@ -2716,7 +2716,7 @@ We will demonstrate the first use of redux by adding a new course, to do that we
     export default CoursesPage;
     ```
 
-    for both functions, so now we have bound them to the "this" of the CoursesPage component.
+    so now we have bound them to the "this" of the CoursesPage component.
 
     We can also do the bind under the render function like this:
 
@@ -2822,9 +2822,13 @@ is just a function that accepts a state and an action and then returns a new sta
      here we used the spread operator "...state" on our existing state and then we used "Object.assign" and pass it our target object which is an empty object in this case, then 
      pass it the course that is passed on our action, finally close out the array.
 
-     THe ES6 spread operator spreads the array as if we took all the values in it and defined them here: "...state" inline, so this "...state" ends up returning a new instance of our 
+     The ES6 spread operator spreads the array as if we took all the values in it and defined them here: "...state" inline, so this "...state" ends up returning a new instance of our 
      state array, then I can use Object to create a deep copy of the course that is passed in, this way these two values together end up returning a new state that contains a new course
      that someone has just passed in via the action.
+
+     In ES6 the spread operator along with object.assign are commonly used within reducers to create a copy of an array with extra values.
+
+     Also note that you can replace the switch/case statements although they are quite common with if statements, if you prefer, even though in Redux we have only one store, reducers let us slice up the management of your store state changes into a number of separate functions, and that is why the switch/case statment is useful so we can say for these specific actionTypes, we want to perform some functions and for any that i don't define within the switch statment I just want tot return the existing state.
 
 > **_//==============================================================\\_**
 >
@@ -3175,4 +3179,113 @@ interact with redux, these are called container components.
     export default connect(mapStateToProps)(CoursesPage);
     ```
 
-    
+> **_//==============================================================\\_**
+>
+> **__**
+>
+> **_\\==============================================================//_**
+
+Now we will update our CoursePage component's render function to display our data, and we will be able to step through the whole redux flow and see how it works.
+
+Lets add this line to our render function in our component:
+
+```
+{this.props.courses.map(this.courseRow)}
+```
+
+So our render function becomes:
+
+```
+render() {
+    return (
+      <div>
+        <h1>Courses</h1>
+        {this.props.courses.map(this.courseRow)}
+        <h2>Add Course</h2>
+        <input
+          type="text"
+          onChange={this.onTitleChange}
+          value={this.state.course.title} />
+
+        <input
+          type="submit"
+          value="Save"
+          onClick={this.onClickSave} />
+      </div>
+    );
+}
+```
+
+now lets create the courseRow function:
+
+```
+courseRow(course, index) {
+  return <div key={index}>{course.title}</div>
+}
+```
+
+and the our src/components/course/coursePage.js file becomes:
+
+```
+import React, {PropTypes} from 'react';
+import {connect} from 'react-redux';
+import * as courseActions from '../../actions/courseActions';
+
+class CoursesPage extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = {
+    course: { title: "" } //setting this to null will raise an error, make sure you use an initial value with an empty string ""
+    };
+
+    this.onTitleChange = this.onTitleChange.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
+  }
+
+  onTitleChange(event) {
+  const course = this.state.course;
+  course.title = event.target.value;
+  this.setState({course: course});
+  }
+
+  onClickSave() {
+    // alert(`Saving ${this.state.course.title}`);
+    this.props.dispatch(courseActions.createCourse(this.state.course));
+  }
+
+  courseRow(course, index) {
+    return <div key={index}>{course.title}</div>
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Courses</h1>
+        {this.props.courses.map(this.courseRow)}
+        <h2>Add Course</h2>
+        <input
+          type="text"
+          onChange={this.onTitleChange}
+          value={this.state.course.title} />
+
+        <input
+          type="submit"
+          value="Save"
+          onClick={this.onClickSave} />
+      </div>
+    );
+  }
+}
+
+function mapStateToProps(state, ownProps) {
+  return {
+    courses: state.courses
+  };
+}
+
+export default connect(mapStateToProps)(CoursesPage);
+```
+
+
+
