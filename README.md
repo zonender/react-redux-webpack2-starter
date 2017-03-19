@@ -3491,5 +3491,191 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
 ```
 
-All we are doing is wrapping our action in call to dispatch so that it is easier to use above in our component
+All we are doing is wrapping our action in call to dispatch so that it is easier to use above in our component.
 
+> **_//==============================================================\\_**
+>
+> **_mapStateToProps mapping, the third way, using BindActionCreators_**
+>
+> **_\\==============================================================//_**
+
+We just saw how mapDispatchToPorps simplified dispatching our action within our component, our call here in mapDispatchToPorps is still a bit verbose and can be more turse, Redux comes with a helper function that helps us avoid mannually wrapping our action creators in a dispatch call, the function is called bindActionCreators, so lets start using it.
+
+01. ) Lets import it first:
+
+    ```
+    import {bindActionCreators} from 'redux';
+    ```
+
+01. ) Then we can using it in the mapDispatchToPorps function like this:
+
+    ```
+    function mapDispatchToProps(dispatch) {
+      return {
+        actions: bindActionCreators(courseActions, dispatch)
+      };
+    }
+    ```
+
+    The way this works is instead of doing this:
+    
+    ```
+    function mapDispatchToProps(dispatch) {
+      return {
+        createCourse: course => dispatch(courseActions.createCourse(course))
+      };
+    }
+    ```
+    we call bindActionCreators like this:
+    
+    ```
+    function mapDispatchToProps(dispatch) {
+      return {
+        createCourse: bindActionCreators(courseActions, dispatch)
+      };
+    }
+    ```
+    and it will do the work for us, we passed it the courseActions and our dispatch parameters, bindActionCreators will go through our courseActions and find all the actions in the file: src/actions/courseActions.js and wrap them in a call to dispatch, since it's going to be all those actions, we should change the parameter "createCourse" to "actions" like this:
+
+    ```
+    function mapDispatchToProps(dispatch) {
+      return {
+        actions: bindActionCreators(courseActions, dispatch)
+      };
+    }
+    ```
+
+    because now we will be mapping to all the actions in the file src/actions/courseActions.js and we can be expecting our actions to be placed in this.props.actions, it helps separate my actions from my courses, this also means we have to update our Proptypes validation by changing "courses" to actions:
+
+    ```
+    CoursesPage.propTypes = {
+      courses: PropTypes.array.isRequired,
+      actions: PropTypes.object.isRequired
+    };
+    ```
+
+    also we have to change our onClickSave function to:
+
+    ```
+    onClickSave() {
+      this.props.actions.createCourse(this.state.course);
+    }
+    ```
+
+    To clarify, we didn't have to add action as an extra object here:
+
+    ```
+    function mapDispatchToProps(dispatch) {
+      return {
+        actions: bindActionCreators(courseActions, dispatch)
+      };
+    }
+    ```
+
+    we could have mapped a specific action here, we could have said courseActions.createCourse and then we could have left createCourse at the begining like this:
+
+    ```
+    function mapDispatchToProps(dispatch) {
+      return {
+        createCourse: bindActionCreators(courseActions.createCourse, dispatch)
+      };
+    }
+    ```
+
+    But is is better to keep the actions under actions like this:
+
+    ```
+    function mapDispatchToProps(dispatch) {
+      return {
+        actions: bindActionCreators(courseActions, dispatch)
+      };
+    }
+    ```
+
+    and map all of the course actions and wrap them in a dispatch, so the bindActionCreators is a handy way to reduce the amount of work in mapping my dispatch to props.
+    
+    so our src/course/CoursePage.js becomes:
+
+  > Note: This is the third and prefered method of wiring up the call to dispatch.
+    
+    ```
+    import React, {PropTypes} from 'react';
+    import { connect } from 'react-redux';
+    import * as courseActions from '../../actions/courseActions';
+    import { bindActionCreators } from 'redux';
+
+    class CoursesPage extends React.Component {
+      constructor(props, context) {
+        super(props, context);
+
+        this.state = {
+        course: { title: "" }
+        };
+
+        this.onTitleChange = this.onTitleChange.bind(this);
+        this.onClickSave = this.onClickSave.bind(this);
+      }
+
+      onTitleChange(event) {
+      const course = this.state.course;
+      course.title = event.target.value;
+      this.setState({course: course});
+      }
+
+      onClickSave() {
+        this.props.actions.createCourse(this.state.course);
+      }
+
+      courseRow(course, index) {
+        return <div key={index}>{course.title}</div>;
+      }
+
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+            {this.props.courses.map(this.courseRow)}
+            <h2>Add Course</h2>
+            <input
+              type="text"
+              onChange={this.onTitleChange}
+              value={this.state.course.title} />
+
+            <input
+              type="submit"
+              value="Save"
+              onClick={this.onClickSave} />
+          </div>
+        );
+      }
+    }
+
+    CoursesPage.propTypes = {
+      courses: PropTypes.array.isRequired,
+      actions: PropTypes.object.isRequired
+    };
+
+    function mapStateToProps(state, ownProps) {
+      return {
+        courses: state.courses
+      };
+    }
+
+    function mapDispatchToProps(dispatch) {
+      return {
+        actions: bindActionCreators(courseActions, dispatch)
+      };
+    }
+
+    export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+    ```
+
+    now lets make sure it works.
+
+    run the app:
+
+    ```
+    npm start -s
+    ```
+
+    One last note is that you can call the functions: mapStateToProps and mapDispatchToProps anything you like.
