@@ -4142,3 +4142,17 @@ class CourseApi {
 
 export default CourseApi;
 ```
+
+> **_//==============================================================\\_**
+>
+> **_Removing the inline Form_**
+>
+> **_\\==============================================================//_**
+
+Our container component src/components/course/CoursePage.js contains a lot of JSX in the render function and it is currently used to display courses and add courses, these should be handled separately.
+
+first lets remove the in line form in our src/components/course/CoursePage.js
+
+The lets remove the onTitleChange function and the onClickSave function and the corresponding binds in the constructor.
+
+And lets also remove the sate initialization "this.state" because this page will no longer be managing courses it is just going to show the list of courses, we will now have this page load a list of existing courses using the mock api, we will load the courses by by displaying an action with redux, and to make this happen we will use redux thunks.
