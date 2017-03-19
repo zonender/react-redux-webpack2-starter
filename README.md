@@ -2053,385 +2053,385 @@ We are going to add a few react components to this app:
 
 01. ) Make sure to include all the following dependencies in the app by updating the package.json file as follows and save it:
 
-```
-{
-  "name": "react-redux-weback2-starter",
-  "version": "1.0.0",
-  "description": "Starter kit with React, Redux and Webpack2",
-  "scripts": {
-    "prestart": "babel-node buildScripts/startMessage.js",
-    "start": "npm-run-all --parallel security-check open:src",
-    "open:src": "babel-node buildScripts/srcServer.js",
-    "security-check": "nsp check",
-    "localtunnel": "lt --port 3000",
-    "share": "npm-run-all --parallel open:src localtunnel",
-    "clean": "rimraf build",
-    "serve": "webpack-dev-server --open --config webpack.config.dev.js",
-    "lint": "esw webpack.config.* src buildScripts --color",
-    "lint:watch": "npm run lint -- --watch",
-    "clean-dist": "rimraf ./dist && mkdir dist",
-    "prebuild": "npm-run-all clean-dist lint",
-    "build": "babel-node buildScripts/build.js",
-    "postbuild": "babel-node buildScripts/distServer.js",
-    "deploy": "surge ./dist"
-  },
-  "author": "Asim Abdelgadir",
-  "license": "MIT",
-  "dependencies": {
-    "babel-polyfill": "6.8.0",
-    "bootstrap": "3.3.6",
-    "jquery": "2.2.3",
-    "numeral": "^2.0.4",
-    "react": "15.0.2",
-    "react-dom": "15.0.2",
-    "react-redux": "4.4.5",
-    "react-router": "2.4.0",
-    "react-router-redux": "4.0.4",
-    "redux": "3.5.2",
-    "redux-thunk": "2.0.1",
-    "toastr": "2.1.2"
-  },
-  "devDependencies": {
-    "babel-cli": "6.8.0",
-    "babel-core": "6.8.0",
-    "babel-loader": "6.2.4",
-    "babel-plugin-react-display-name": "2.0.0",
-    "babel-plugin-react-transform": "^2.0.0-beta1",
-    "babel-preset-es2015": "6.6.0",
-    "babel-preset-react": "6.5.0",
-    "babel-preset-react-hmre": "1.1.1",
-    "babel-register": "6.8.0",
-    "cheerio": "0.22.0",
-    "colors": "1.1.2",
-    "compression": "1.6.1",
-    "cross-env": "1.0.7",
-    "css-loader": "^0.23.1",
-    "enzyme": "2.2.0",
-    "eslint": "^3.17.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-react": "^6.10.0",
-    "eslint-watch": "^2.1.13",
-    "eventsource-polyfill": "0.9.6",
-    "expect": "1.19.0",
-    "express": "4.13.4",
-    "extract-text-webpack-plugin": "^2.1.0",
-    "file-loader": "0.8.5",
-    "html-webpack-plugin": "^2.28.0",
-    "image-webpack-loader": "^3.2.0",
-    "install": "^0.8.7",
-    "jsdom": "8.5.0",
-    "localtunnel": "^1.8.2",
-    "mocha": "2.4.5",
-    "nock": "8.0.0",
-    "npm": "^4.3.0",
-    "npm-run-all": "1.8.0",
-    "nsp": "^2.6.2",
-    "open": "0.0.5",
-    "raw-loader": "^0.5.1",
-    "react-addons-test-utils": "15.0.2",
-    "react-hot-loader": "^3.0.0-beta.6",
-    "react-transform-hmr": "^1.0.4",
-    "redux-immutable-state-invariant": "1.2.3",
-    "redux-mock-store": "1.0.2",
-    "rimraf": "^2.5.2",
-    "style-loader": "^0.13.1",
-    "surge": "^0.18.0",
-    "url-loader": "^0.5.7",
-    "webpack": "^2.2.1",
-    "webpack-dev-middleware": "^1.10.1",
-    "webpack-dev-server": "^2.4.1",
-    "webpack-hot-middleware": "^2.17.1",
-    "webpack-md5-hash": "^0.0.5"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/zonender/react-redux-weback2-starter"
-  }
-}
-```
+    ```
+    {
+      "name": "react-redux-weback2-starter",
+      "version": "1.0.0",
+      "description": "Starter kit with React, Redux and Webpack2",
+      "scripts": {
+        "prestart": "babel-node buildScripts/startMessage.js",
+        "start": "npm-run-all --parallel security-check open:src",
+        "open:src": "babel-node buildScripts/srcServer.js",
+        "security-check": "nsp check",
+        "localtunnel": "lt --port 3000",
+        "share": "npm-run-all --parallel open:src localtunnel",
+        "clean": "rimraf build",
+        "serve": "webpack-dev-server --open --config webpack.config.dev.js",
+        "lint": "esw webpack.config.* src buildScripts --color",
+        "lint:watch": "npm run lint -- --watch",
+        "clean-dist": "rimraf ./dist && mkdir dist",
+        "prebuild": "npm-run-all clean-dist lint",
+        "build": "babel-node buildScripts/build.js",
+        "postbuild": "babel-node buildScripts/distServer.js",
+        "deploy": "surge ./dist"
+      },
+      "author": "Asim Abdelgadir",
+      "license": "MIT",
+      "dependencies": {
+        "babel-polyfill": "6.8.0",
+        "bootstrap": "3.3.6",
+        "jquery": "2.2.3",
+        "numeral": "^2.0.4",
+        "react": "15.0.2",
+        "react-dom": "15.0.2",
+        "react-redux": "4.4.5",
+        "react-router": "2.4.0",
+        "react-router-redux": "4.0.4",
+        "redux": "3.5.2",
+        "redux-thunk": "2.0.1",
+        "toastr": "2.1.2"
+      },
+      "devDependencies": {
+        "babel-cli": "6.8.0",
+        "babel-core": "6.8.0",
+        "babel-loader": "6.2.4",
+        "babel-plugin-react-display-name": "2.0.0",
+        "babel-plugin-react-transform": "^2.0.0-beta1",
+        "babel-preset-es2015": "6.6.0",
+        "babel-preset-react": "6.5.0",
+        "babel-preset-react-hmre": "1.1.1",
+        "babel-register": "6.8.0",
+        "cheerio": "0.22.0",
+        "colors": "1.1.2",
+        "compression": "1.6.1",
+        "cross-env": "1.0.7",
+        "css-loader": "^0.23.1",
+        "enzyme": "2.2.0",
+        "eslint": "^3.17.0",
+        "eslint-plugin-import": "^2.2.0",
+        "eslint-plugin-react": "^6.10.0",
+        "eslint-watch": "^2.1.13",
+        "eventsource-polyfill": "0.9.6",
+        "expect": "1.19.0",
+        "express": "4.13.4",
+        "extract-text-webpack-plugin": "^2.1.0",
+        "file-loader": "0.8.5",
+        "html-webpack-plugin": "^2.28.0",
+        "image-webpack-loader": "^3.2.0",
+        "install": "^0.8.7",
+        "jsdom": "8.5.0",
+        "localtunnel": "^1.8.2",
+        "mocha": "2.4.5",
+        "nock": "8.0.0",
+        "npm": "^4.3.0",
+        "npm-run-all": "1.8.0",
+        "nsp": "^2.6.2",
+        "open": "0.0.5",
+        "raw-loader": "^0.5.1",
+        "react-addons-test-utils": "15.0.2",
+        "react-hot-loader": "^3.0.0-beta.6",
+        "react-transform-hmr": "^1.0.4",
+        "redux-immutable-state-invariant": "1.2.3",
+        "redux-mock-store": "1.0.2",
+        "rimraf": "^2.5.2",
+        "style-loader": "^0.13.1",
+        "surge": "^0.18.0",
+        "url-loader": "^0.5.7",
+        "webpack": "^2.2.1",
+        "webpack-dev-middleware": "^1.10.1",
+        "webpack-dev-server": "^2.4.1",
+        "webpack-hot-middleware": "^2.17.1",
+        "webpack-md5-hash": "^0.0.5"
+      },
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/zonender/react-redux-weback2-starter"
+      }
+    }
+    ```
 
 01. ) Run:
 
-```
-npm install
-```
+    ```
+    npm install
+    ```
 
 01. ) Update the webpack.config file as follows and save it:
 
-```
-const webpack = require('webpack');
-const path = require('path');
-const htmlWebpackPlugin = require('html-webpack-plugin');
+    ```
+    const webpack = require('webpack');
+    const path = require('path');
+    const htmlWebpackPlugin = require('html-webpack-plugin');
 
-const config = {
-  //The entry point for the bundle.
-  watch: true,
-  devtool: 'cheap-module-eval-source-map',
-  entry: {
-    //hot reloading
-    bundle: ['eventsource-polyfill', 'webpack-hot-middleware/client?reload=true', path.resolve(__dirname, 'src/index')]
-    //without hot reloading
-    // bundle: path.resolve(__dirname, 'src/index')
-  },
-  output: {
-    path: path.join(__dirname, 'dist'),
-    publicPath: '/',
-    filename: 'bundle.js'
-  },
-  module: {
-    rules: [
-      {
-        use: ['babel-loader'], //here we are selecting the loader
-        test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
-        exclude: /node_modules/
+    const config = {
+      //The entry point for the bundle.
+      watch: true,
+      devtool: 'cheap-module-eval-source-map',
+      entry: {
+        //hot reloading
+        bundle: ['eventsource-polyfill', 'webpack-hot-middleware/client?reload=true', path.resolve(__dirname, 'src/index')]
+        //without hot reloading
+        // bundle: path.resolve(__dirname, 'src/index')
       },
-      {
-        test: /\.html$/,
-        use: "raw-loader"
+      output: {
+        path: path.join(__dirname, 'dist'),
+        publicPath: '/',
+        filename: 'bundle.js'
       },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      },
-      {
-        test: /\.(jpe?g|jpg|png|gif|svg)$/,
-        use: [
+      module: {
+        rules: [
           {
-            loader: 'url-loader'
+            use: ['babel-loader'], //here we are selecting the loader
+            test: /(\.js|\.jsx)$/, //and here we specify which file the loader will process
+            exclude: /node_modules/
           },
-          'image-webpack-loader'
+          {
+            test: /\.html$/,
+            use: "raw-loader"
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
+          },
+          {
+            test: /\.(jpe?g|jpg|png|gif|svg)$/,
+            use: [
+              {
+                loader: 'url-loader'
+              },
+              'image-webpack-loader'
+            ]
+          },
+          { test: /\.(png|woff|woff2|eot|ttf|svg)$/, use: 'url-loader?limit=100000' }
         ]
       },
-      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, use: 'url-loader?limit=100000' }
-    ]
-  },
-  plugins: [
-      //hr
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.NoEmitOnErrorsPlugin(),
-      //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
-      new htmlWebpackPlugin({
-            template: 'src/index.html' //if we do not specifiy a template, it will use the default one
-      }),
-      new webpack.LoaderOptionsPlugin({
-        options: {
-            noInfo: false,
-            debug: true,
-            devtool: 'inline-source-map',
-            target: 'web'
-        }
-      })
-  ]
-};
+      plugins: [
+          //hr
+          new webpack.HotModuleReplacementPlugin(),
+          new webpack.NoEmitOnErrorsPlugin(),
+          //this plugin will insert the script tags for bundle.js and vendor.js in our index.html
+          new htmlWebpackPlugin({
+                template: 'src/index.html' //if we do not specifiy a template, it will use the default one
+          }),
+          new webpack.LoaderOptionsPlugin({
+            options: {
+                noInfo: false,
+                debug: true,
+                devtool: 'inline-source-map',
+                target: 'web'
+            }
+          })
+      ]
+    };
 
-module.exports = config;
-```
+    module.exports = config;
+    ```
 
 01. ) Update src/index.js as follows and save it:
 
-```
-// /* global System */ //this is for eslint to allow the use of System.import
-import indexhtml from './index.html';
-import talk from './talkToConsole';
-console.log(talk(1, 2));
+    ```
+    // /* global System */ //this is for eslint to allow the use of System.import
+    import indexhtml from './index.html';
+    import talk from './talkToConsole';
+    console.log(talk(1, 2));
 
-const button = document.createElement('button');
-button.innerText = 'Click Me To Display Images';
-button.onclick = () => {
-    System.import('./image_viewer').then(module => {
-        module.default();
-    });
-};
+    const button = document.createElement('button');
+    button.innerText = 'Click Me To Display Images';
+    button.onclick = () => {
+        System.import('./image_viewer').then(module => {
+            module.default();
+        });
+    };
 
-document.body.appendChild(button);
+    document.body.appendChild(button);
 
-import 'babel-polyfill';
-import React from 'react';
-import { render } from 'react-dom';
-import { Router, browserHistory } from 'react-router';
-import routes from './routes';
-import './styles/style.css';
-import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+    import 'babel-polyfill';
+    import React from 'react';
+    import { render } from 'react-dom';
+    import { Router, browserHistory } from 'react-router';
+    import routes from './routes';
+    import './styles/style.css';
+    import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
-render(
-  <Router history={browserHistory} routes={routes} />,
-  document.getElementById('app')
-);
-```
+    render(
+      <Router history={browserHistory} routes={routes} />,
+      document.getElementById('app')
+    );
+    ```
 
 01. ) Update src/index.html as follows and save it:
 
-```
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title></title>
-    <meta charset="UTF-8">
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    <div id="app"></div>
-  </body>
-</html>
-```
+    ```
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <title></title>
+        <meta charset="UTF-8">
+      </head>
+      <body>
+        <h1>Hello World!</h1>
+        <div id="app"></div>
+      </body>
+    </html>
+    ```
 
 01. ) Update src/styles/style.css as follows and save it:
 
-```
-img {
-    border: 10px solid red;
-}
+    ```
+    img {
+        border: 10px solid red;
+    }
 
-#app {
-  font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: #4d4d4d;
-  min-width: 550px;
-  max-width: 850px;
-  margin: 0 auto;
-}
+    #app {
+      font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #4d4d4d;
+      min-width: 550px;
+      max-width: 850px;
+      margin: 0 auto;
+    }
 
-a.active {
-  color: orange;
-}
+    a.active {
+      color: orange;
+    }
 
-nav {
-  padding-top: 20px;
-}
-```
+    nav {
+      padding-top: 20px;
+    }
+    ```
 
 01. ) Create the file src/routes.js and save it:
 
-```
-import React from 'react';
-import { Route, IndexRoute } from 'react-router';
-import App from './components/App';
-import HomePage from './components/home/HomePage';
-import AboutPage from './components/about/AboutPage';
-import CoursesPage from './components/course/CoursesPage';
+    ```
+    import React from 'react';
+    import { Route, IndexRoute } from 'react-router';
+    import App from './components/App';
+    import HomePage from './components/home/HomePage';
+    import AboutPage from './components/about/AboutPage';
+    import CoursesPage from './components/course/CoursesPage';
 
-export default (
-  <Route path="/" component={App}>
-    <IndexRoute component={HomePage} />
-    <Route path="courses" component={CoursesPage} />
-    <Route path="about" component={AboutPage} />
-  </Route>
-);
-```
+    export default (
+      <Route path="/" component={App}>
+        <IndexRoute component={HomePage} />
+        <Route path="courses" component={CoursesPage} />
+        <Route path="about" component={AboutPage} />
+      </Route>
+    );
+    ```
 
 01. ) Create the file components/about/AboutPage.js and save it:
 
-```
-import React from 'react';
+    ```
+    import React from 'react';
 
-class AboutPage extends React.Component {
-  render() {
-    return (
-      <div>
-        <h1>About</h1>
-        <p>Lorum lkjsdf sdfasdf sdfsadf asdfasdf asdfasdf asdfasdf asdfasdf.</p>
-      </div>
-    );
-  }
-}
+    class AboutPage extends React.Component {
+      render() {
+        return (
+          <div>
+            <h1>About</h1>
+            <p>Lorum lkjsdf sdfasdf sdfsadf asdfasdf asdfasdf asdfasdf asdfasdf.</p>
+          </div>
+        );
+      }
+    }
 
-export default AboutPage;
-```
+    export default AboutPage;
+    ```
 
 01. ) Create the file components/common/Header.js and save it:
 
-```
-import React, {PropTypes} from 'react';
-import { Link, IndexLink } from 'react-router';
+    ```
+    import React, {PropTypes} from 'react';
+    import { Link, IndexLink } from 'react-router';
 
-const Header = () => {
-  return (
-    <nav>
-      <IndexLink to="/" activeClassName="active">Home</IndexLink>
-      {" | "}
-      <Link to="/courses" activeClassName="active">Courses</Link>
-      {" | "}
-      <Link to="/about" activeClassName="active">About</Link>
-    </nav>
-  );
-};
+    const Header = () => {
+      return (
+        <nav>
+          <IndexLink to="/" activeClassName="active">Home</IndexLink>
+          {" | "}
+          <Link to="/courses" activeClassName="active">Courses</Link>
+          {" | "}
+          <Link to="/about" activeClassName="active">About</Link>
+        </nav>
+      );
+    };
 
-export default Header;
-```
+    export default Header;
+    ```
 
 01. ) Create the file components/course/CoursesPage.js and save it:
 
-```
-import React, {PropTypes} from 'react';
+    ```
+    import React, {PropTypes} from 'react';
 
-class CoursesPage extends React.Component {
-  render() {
-    return (
-      <div>
-        <h1>Courses</h1>
-      </div>
-    );
-  }
-}
+    class CoursesPage extends React.Component {
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+          </div>
+        );
+      }
+    }
 
-export default CoursesPage;
-```
+    export default CoursesPage;
+    ```
 
 01. ) Create the file components/home/HomePage.js and save it:
 
-```
-import React from 'react';
-import {Link} from 'react-router';
+    ```
+    import React from 'react';
+    import {Link} from 'react-router';
 
-class HomePage extends React.Component {
-  render() {
-    return (
-      <div className="jumbotron">
-        <h1>Pluralsight Admin</h1>
-        <p>Lorum lkjsdf sdfasdf sdfsadf asdfasdf asdfasdf asdfasdf asdfasdf.</p>
-        <Link to="about" className="btn btn-primary btn-lg">Learn More Here</Link>
-      </div>
-    );
-  }
-}
+    class HomePage extends React.Component {
+      render() {
+        return (
+          <div className="jumbotron">
+            <h1>Pluralsight Admin</h1>
+            <p>Lorum lkjsdf sdfasdf sdfsadf asdfasdf asdfasdf asdfasdf asdfasdf.</p>
+            <Link to="about" className="btn btn-primary btn-lg">Learn More Here</Link>
+          </div>
+        );
+      }
+    }
 
-export default HomePage;
-```
+    export default HomePage;
+    ```
 
 01. ) Create the file components/App.js and save it:
 
-```
-import React, {PropTypes} from 'react';
-import Header from './common/Header';
+    ```
+    import React, {PropTypes} from 'react';
+    import Header from './common/Header';
 
-class App extends React.Component {
-  render() {
-    return (
-      <div className="container-fluid">
-        <Header/>
-        {this.props.children}
-      </div>
-    );
-  }
-}
+    class App extends React.Component {
+      render() {
+        return (
+          <div className="container-fluid">
+            <Header/>
+            {this.props.children}
+          </div>
+        );
+      }
+    }
 
-App.propTypes = {
-  children: PropTypes.object.isRequired
-};
+    App.propTypes = {
+      children: PropTypes.object.isRequired
+    };
 
-export default App;
-```
+    export default App;
+    ```
 
 01. ) Run the app:
 
-```
-npm start
-```
+    ```
+    npm start
+    ```
 
-or
+    or
 
-```
-npm run serve
-```
+    ```
+    npm run serve
+    ```
 
 > **_//==============================================================\\_**
 >
@@ -2641,7 +2641,7 @@ We will demonstrate the first use of redux by adding a new course, to do that we
 
     Running the app now will throw the following error: "Uncaught TypeError: Cannot read property 'state' of undefined"
 
-    Because the "this" keyword in the line: "const course = this.state.course;" in the function: "onTitleChange":
+    Because the "this" keyword in the line: "const course = this.state.course;" in the function: "onTitleChange" actually referes to the function "onTitleChange" and not to the class "CoursesPage":
 
     ```
       onTitleChange(event) {
@@ -2651,7 +2651,7 @@ We will demonstrate the first use of redux by adding a new course, to do that we
       }
     ```
 
-    actually referes to the function "onTitleChange" and not to the class "CoursesPage", so the this context is wrong in our change handler, the function is inheriting the "this" context
+    ,so the "this" context is wrong in our change handler, the function is inheriting the "this" context
     from the caller, which in this case the caller is the "onTitleChange" function.
 
     When using react's create class function, functions are autobound for you and you don't have to use "bind", however, react doesn't autobind in ES6 classes so we have to handle
@@ -3181,7 +3181,7 @@ interact with redux, these are called container components.
 
 > **_//==============================================================\\_**
 >
-> **__**
+> **_Displaying the data in our component_**
 >
 > **_\\==============================================================//_**
 
@@ -3287,5 +3287,78 @@ function mapStateToProps(state, ownProps) {
 export default connect(mapStateToProps)(CoursesPage);
 ```
 
+> **_//==============================================================\\_**
+>
+> **_STEPPING THROUGH REDUX FLOW_**
+>
+> **_\\==============================================================//_**
 
+Here is the entire Redux flow:
 
+01. ) We dispatched an action in the src/course/CoursePage.js file specifically at:
+
+    ```
+    onClickSave() {
+      this.props.dispatch(courseActions.createCourse(this.state.course));
+    }
+    ```
+01. ) Then that is landing at the src/actions/courseActions.js file in our "CREATE_COURSE" action creator.
+
+    ```
+    export function createCourse(course) {
+      return {type: 'CREATE_COURSE', course};
+    }
+    ```
+
+01. ) And that is handled in our src/reducers/courseReducer.js right here looking for the particular actionType:
+
+    ```
+    import objectAssign from 'object-assign';
+
+    export default function courseReducer(state = [], action) {
+      switch (action.type) {
+        case 'CREATE_COURSE':
+          return [...state,
+            objectAssign({}, action.course)
+          ];
+
+        default:
+          return state;
+      }
+    }
+    ```
+
+01. ) Then we land back in our mapStateToProps function in src/course/CoursePage.js where we pull the state and map it to our courses property:
+
+    ```
+    function mapStateToProps(state, ownProps) {
+      return {
+        courses: state.courses
+      };
+    }
+    ```
+
+01. ) Then finally the new render function is called here:
+
+    ```
+      render() {
+        return (
+          <div>
+            <h1>Courses</h1>
+            {this.props.courses.map(this.courseRow)}
+            <h2>Add Course</h2>
+            <input
+              type="text"
+              onChange={this.onTitleChange}
+              value={this.state.course.title} />
+
+            <input
+              type="submit"
+              value="Save"
+              onClick={this.onClickSave} />
+          </div>
+        );
+      }
+    ```
+
+    After our mapStateToProps function ends up injecting new data for our component.
