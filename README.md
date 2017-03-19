@@ -3224,11 +3224,13 @@ courseRow(course, index) {
 }
 ```
 
-and the our src/components/course/coursePage.js file becomes:
+and our src/components/course/coursePage.js file becomes:
+
+> Note: This is the first method of wiring up the call to dispatch.
 
 ```
 import React, {PropTypes} from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import * as courseActions from '../../actions/courseActions';
 
 class CoursesPage extends React.Component {
@@ -3236,7 +3238,7 @@ class CoursesPage extends React.Component {
     super(props, context);
 
     this.state = {
-    course: { title: "" } //setting this to null will raise an error, make sure you use an initial value with an empty string ""
+    course: { title: "" }
     };
 
     this.onTitleChange = this.onTitleChange.bind(this);
@@ -3250,12 +3252,11 @@ class CoursesPage extends React.Component {
   }
 
   onClickSave() {
-    // alert(`Saving ${this.state.course.title}`);
     this.props.dispatch(courseActions.createCourse(this.state.course));
   }
 
   courseRow(course, index) {
-    return <div key={index}>{course.title}</div>
+    return <div key={index}>{course.title}</div>;
   }
 
   render() {
@@ -3277,6 +3278,11 @@ class CoursesPage extends React.Component {
     );
   }
 }
+
+CoursesPage.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  courses: PropTypes.array.isRequired
+};
 
 function mapStateToProps(state, ownProps) {
   return {
@@ -3362,3 +3368,128 @@ Here is the entire Redux flow:
     ```
 
     After our mapStateToProps function ends up injecting new data for our component.
+
+> **_//==============================================================\\_**
+>
+> **_mapStateToProps manual mapping_**
+>
+> **_\\==============================================================//_**
+
+When we first wired up the call to dispatch the createCourse action, we mentioned there was a cleaner way to get is done, that is accomplished with the second function we pass to the connect function, which is mapDispatchToProps.
+
+The mapDispatchToProps function determines what actions are avaialble in the component, so lets add the reference here in the src/course/CoursePage.js and define it:
+
+```
+function mapDispatchToProps(dispatch) {
+  return {
+    createCourse: course => dispatch(courseActions.createCourse(course))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+```
+
+Then we can modify the onClickSave function as follows:
+
+```
+  onClickSave() {
+    this.props.createCourse(this.state.course);
+  }
+```
+
+What we did is wrapped the action creator in a call to dispatch like this: "dispatch(courseActions.createCourse(course))" this is how we mannually map actions to props.
+
+Also note that if we didn't wrap the action creator "courseActions.createCourse(course)" in the call to dispatch: "dispatch(courseActions.createCourse(course))" the onClickSave function would do nothing but call the createCourse function in src/actions/createActions.js which just retruns an object, this object by its self does nothing, this will be like just referencing an object, but if we want to actually create a course we will have to call dispatch and that will trigger our flow through Redux.
+
+Now that we have this mapping setup, that is the mapping of actions to props, we have declared that our component above will receive createCourse as a prop and will be wrapped in a call to dispatch.
+
+> Note: Saying "The call to dispatch = "calling the dispatch function"
+
+Finally we will have to update our props validation, by adding "createCourse" and remove "dispatch":
+
+```
+CoursesPage.propTypes = {
+  courses: PropTypes.array.isRequired,
+  createCourse: PropTypes.func.isRequired
+};
+```
+
+We removed "dispatch" because it is no longer being injected as a property now that we have defined mapDispatchToProps function, once we started defining the mapDispatchToProps function, the function connect will no longer add a dispatch property on our component, remember we are passing "dispatch" in the mapDispatchToProps and is no longer injected in the component as before, and hence we can remove it from our prop validation.
+
+so our src/course/CoursePage.js becomes:
+
+> Note: This is the second method of wiring up the call to dispatch.
+
+```
+import React, {PropTypes} from 'react';
+import { connect } from 'react-redux';
+import * as courseActions from '../../actions/courseActions';
+
+class CoursesPage extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = {
+    course: { title: "" }
+    };
+
+    this.onTitleChange = this.onTitleChange.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
+  }
+
+  onTitleChange(event) {
+  const course = this.state.course;
+  course.title = event.target.value;
+  this.setState({course: course});
+  }
+
+  onClickSave() {
+    this.props.createCourse(this.state.course);
+  }
+
+  courseRow(course, index) {
+    return <div key={index}>{course.title}</div>;
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Courses</h1>
+        {this.props.courses.map(this.courseRow)}
+        <h2>Add Course</h2>
+        <input
+          type="text"
+          onChange={this.onTitleChange}
+          value={this.state.course.title} />
+
+        <input
+          type="submit"
+          value="Save"
+          onClick={this.onClickSave} />
+      </div>
+    );
+  }
+}
+
+CoursesPage.propTypes = {
+  courses: PropTypes.array.isRequired,
+  createCourse: PropTypes.func.isRequired
+};
+
+function mapStateToProps(state, ownProps) {
+  return {
+    courses: state.courses
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    createCourse: course => dispatch(courseActions.createCourse(course))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+```
+
+All we are doing is wrapping our action in call to dispatch so that it is easier to use above in our component
+
