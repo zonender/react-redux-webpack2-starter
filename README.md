@@ -1,5 +1,5 @@
 ---
-# SETTINGUP A JAVASCRIPT DEVELOPMENT ENVIRONMENT
+# A REACT-REDUX STARTER KIT WITH WEBPACK 2
 ---
 
 * Start Date: 04 Mar 2017 
@@ -1222,7 +1222,8 @@ It is good proctise to have two separate webpack.config files, one for the dev e
         ]
       },
       plugins: [
-          //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
+          //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js
+          // if there are it will remove them from bundle.js and put them in vendor.js
           new webpack.optimize.CommonsChunkPlugin({
                 names: ['vendor', 'manifest']
           }),
@@ -1424,7 +1425,8 @@ const config = {
       filename: '[name][chunkhash].css',
       allChunks: true,
       }),
-      //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
+      //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js 
+      //if there are it will remove them from bundle.js and put them in vendor.js
       new webpack.optimize.CommonsChunkPlugin({
             names: ['vendor', 'manifest']
       }),
@@ -1683,7 +1685,8 @@ const config = {
       filename: '[name][chunkhash].css',
       allChunks: true,
       }),
-      //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
+      //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js
+      // if there are it will remove them from bundle.js and put them in vendor.js
       new webpack.optimize.CommonsChunkPlugin({
             names: ['vendor', 'manifest']
       }),
@@ -1754,7 +1757,8 @@ export default {
       filename: '[name][chunkhash].css',
       allChunks: true,
       }),
-      //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js if there are it will remove them from bundle.js and put them in vendor.js
+      //this plugin will make sure there is no duplicate modules between vendor.js and bundle.js
+      // if there are it will remove them from bundle.js and put them in vendor.js
       new webpack.optimize.CommonsChunkPlugin({
             names: ['vendor', 'manifest']
       }),
@@ -1862,7 +1866,11 @@ const config = {
   devtool: 'cheap-module-eval-source-map',
   entry: {
     //hot reloading
-    bundle: ['eventsource-polyfill', 'webpack-hot-middleware/client?reload=true', path.resolve(__dirname, 'src/index')]
+    bundle: [
+      'eventsource-polyfill',
+      'webpack-hot-middleware/client?reload=true',
+      path.resolve(__dirname, 'src/index')
+    ]
     //without hot reloading
     // bundle: path.resolve(__dirname, 'src/index')
   },
@@ -1951,7 +1959,11 @@ const config = {
   devtool: 'cheap-module-eval-source-map',
   entry: {
     //hot reloading
-    bundle: ['eventsource-polyfill', 'webpack-hot-middleware/client?reload=true', path.resolve(__dirname, 'src/index')]
+    bundle: [
+      'eventsource-polyfill',
+      'webpack-hot-middleware/client?reload=true',
+      path.resolve(__dirname, 'src/index')
+    ]
     //without hot reloading
     // bundle: path.resolve(__dirname, 'src/index')
   },
@@ -2169,7 +2181,11 @@ We are going to add a few react components to this app:
       devtool: 'cheap-module-eval-source-map',
       entry: {
         //hot reloading
-        bundle: ['eventsource-polyfill', 'webpack-hot-middleware/client?reload=true', path.resolve(__dirname, 'src/index')]
+        bundle: [
+          'eventsource-polyfill', 
+          'webpack-hot-middleware/client?reload=true', 
+          path.resolve(__dirname, 'src/index')
+        ]
         //without hot reloading
         // bundle: path.resolve(__dirname, 'src/index')
       },
@@ -3133,7 +3149,8 @@ interact with redux, these are called container components.
         super(props, context);
 
         this.state = {
-        course: { title: "" } //setting this to null will raise an error, make sure you use an initial value with an empty string ""
+        //setting this to null will raise an error, make sure you use an initial value with an empty string ""
+        course: { title: "" } 
         };
 
         this.onTitleChange = this.onTitleChange.bind(this);
@@ -3679,3 +3696,187 @@ We just saw how mapDispatchToPorps simplified dispatching our action within our 
     ```
 
     One last note is that you can call the functions: mapStateToProps and mapDispatchToProps anything you like.
+
+> **_//==============================================================\\_**
+>
+> **_Review the structure of a container component_**
+>
+> **_\\==============================================================//_**
+
+
+Our container component src/components/course/CoursePage.js has five main parts that utilizes all core pieces of Redux and React-Redux, And this is how it looks like:
+
+```
+import React, {PropTypes} from 'react';
+import { connect } from 'react-redux';
+import * as courseActions from '../../actions/courseActions';
+import { bindActionCreators } from 'redux';
+
+class CoursesPage extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = {
+    course: { title: "" }
+    };
+
+    this.onTitleChange = this.onTitleChange.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
+  }
+
+  onTitleChange(event) {
+  const course = this.state.course;
+  course.title = event.target.value;
+  this.setState({course: course});
+  }
+
+  onClickSave() {
+    this.props.actions.createCourse(this.state.course);
+  }
+
+  courseRow(course, index) {
+    return <div key={index}>{course.title}</div>;
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Courses</h1>
+        {this.props.courses.map(this.courseRow)}
+        <h2>Add Course</h2>
+        <input
+          type="text"
+          onChange={this.onTitleChange}
+          value={this.state.course.title} />
+
+        <input
+          type="submit"
+          value="Save"
+          onClick={this.onClickSave} />
+      </div>
+    );
+  }
+}
+
+CoursesPage.propTypes = {
+  courses: PropTypes.array.isRequired,
+  actions: PropTypes.object.isRequired
+};
+
+function mapStateToProps(state, ownProps) {
+  return {
+    courses: state.courses
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(courseActions, dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+```
+
+These are the five main section of our container component:
+
+01. ) The constructor:
+
+    ```
+    constructor(props, context) {
+      super(props, context);
+
+      this.state = {
+      course: { title: "" }
+      };
+
+      this.onTitleChange = this.onTitleChange.bind(this);
+      this.onClickSave = this.onClickSave.bind(this);
+    }
+    ```
+
+    in the constructor we are going to initialize state:
+
+    ```
+    this.state = {
+    course: { title: "" }
+    };
+    ```
+
+    and we are going to call our bind functions:
+
+    ```
+    this.onTitleChange = this.onTitleChange.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
+    ```
+
+01. ) Then we have our Child functions which are called by render:
+
+    ```
+    onTitleChange(event) {
+    const course = this.state.course;
+    course.title = event.target.value;
+    this.setState({course: course});
+    }
+
+    onClickSave() {
+      this.props.actions.createCourse(this.state.course);
+    }
+
+    courseRow(course, index) {
+      return <div key={index}>{course.title}</div>;
+    }
+    ```
+
+01. ) Then we have our render function where we would typically just call a child component:
+
+    ```
+    render() {
+      return (
+        <div>
+          <h1>Courses</h1>
+          {this.props.courses.map(this.courseRow)}
+          <h2>Add Course</h2>
+          <input
+            type="text"
+            onChange={this.onTitleChange}
+            value={this.state.course.title} />
+
+          <input
+            type="submit"
+            value="Save"
+            onClick={this.onClickSave} />
+        </div>
+      );
+    }
+    ```
+
+    we should typically keep the markup separate in a child component then we call that child component, but here for simplicity we kept the markup inline.
+
+01. ) Then we have our proptypes that provide our prop types with validation:
+
+    ```
+    CoursesPage.propTypes = {
+      courses: PropTypes.array.isRequired,
+      actions: PropTypes.object.isRequired
+    };
+    ```
+
+01. ) Finally we have our redux connect and related functions
+
+    ```
+    function mapStateToProps(state, ownProps) {
+      return {
+        courses: state.courses
+      };
+    }
+
+    function mapDispatchToProps(dispatch) {
+      return {
+        actions: bindActionCreators(courseActions, dispatch)
+      };
+    }
+
+    export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+    ```
+
