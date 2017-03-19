@@ -3880,3 +3880,51 @@ These are the five main section of our container component:
     export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
     ```
 
+> **_//==============================================================\\_**
+>
+> **_Using Action Type Constants_**
+>
+> **_\\==============================================================//_**
+
+We are going to create a file called actionTypes.js and in it we will put all our action constants, under the src/actions folder create a file called: src/actions/actionTypes.js, in the file put the constat CREATE_COURSE:
+
+```
+export const CREATE_COURSE = 'CREATE_COURSE';
+```
+
+Then in the src/actions/courseActions.js file import the constant by typing on the top line:
+
+```
+import * as types from './actionTypes'; 
+```
+
+So our src/actions/courseActions.js file becomes:
+
+```
+import * as types from './actionTypes';
+
+export function createCourse(course) {
+  return {type: types.CREATE_COURSE, course};
+}
+```
+
+We also have to use it in our src/reducers/courseReducer.js like this:
+
+```
+import objectAssign from 'object-assign';
+import * as types from '../actions/actionTypes';
+
+export default function courseReducer(state = [], action) {
+  switch (action.type) {
+    case types.CREATE_COURSE:
+      return [...state,
+        objectAssign({}, action.course)
+      ];
+
+    default:
+      return state;
+  }
+}
+```
+
+Now run the app and make sure it is running as expected.
