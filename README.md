@@ -4194,4 +4194,212 @@ export default function configureStore(initialState) {
 }
 ```
 
-The same method can be used to apply as many peices of middleware as we want to the applyMiddleware function, other useful middleware can be found in the redux docmunetation that includes logging, scheduling actions, and sedn crash reports. 
+The same method can be used to apply as many peices of middleware as we want to the applyMiddleware function, other useful middleware can be found in the redux docmunetation that includes logging, scheduling actions, and sedn crash reports.
+
+And now thunk is part of our redux middleware.
+
+> **_//==============================================================\\_**
+>
+> **_Create Load Courses Thunk_**
+>
+> **_\\==============================================================//_**
+
+Now we are ready to create our first thunk to handle making asynchronous call, for our first thunk we will create a way to load courses when the app initially loads.
+
+We will start by opening the src/actions/courseActions.js file, then we will put our thunk at the bottom of the file, we can also place them in a separate file:
+
+First we will create the function: loadCourses(), then we will make an asynchronous call to our api, so we want to handle the promise and then dispatch the acxtion when the promise is resolved.
+
+Then we will import the courseApi:
+
+```
+import courseApi from '../api/mockCourseApi';
+```
+
+then we will have to add some boiler plate that is nessaccery for each thunk, remember a thunk always returns a function that accepts a dispatch, so let us add this now:
+
+```
+export function loadCourses() {
+  return function (dispatch) {
+    return courseApi.getAllCourses().then(courses => {
+      dispatch(loadCoursesSuccess(courses));
+    }).catch(error => {
+      throw(error);
+    })
+  }
+}
+```
+
+this wrapper function will exist in every one of our thunks, now we are inside the body of our thunk, at this point it is logical to make our api call, getAllCourses returns a promise, if you open the src/api/mockCourseApi.js you will see that, then we will handle this promise using the keyword ".then", then we are expecting getAllCourses promise to return a list of courses, and then we will handle it here within an arrow function "courses => {}", since there is only one parameter for this arrow function we can omit the parentheses around "courses" so it is an anonymous function, then after this promise returns we are ready to dispatch an action creator, at this point we will dispatch something called loadCoursesSuccess and we will pass it a list of courses, the action creator loadCoursesSuccess doesn't exist yet, we will create it in a moment, then we added some error handling by adding .catch to the promise  then we will just throw the error, you can choose to create a dedicated action creator to handle errors, but for now we will just use a .catch on the promise.
+
+In other examples people will use a fetch call or an AJAX call, with this setup if we want to use a real api we just have to change the import at the top of the file.
+
+Now lets create the loadCoursesSuccess action, we first have to create a new constant in the src/actions/actionTypes.js file:
+
+```
+export const LOAD_COURSES_SUCCESS = 'LOAD_COURSES_SUCCESS';
+```
+
+we can delete: export const CREATE_COURSE = 'CREATE_COURSE';
+
+then we will have to go back to the src/actions/courseAction.js to add the action loadCoursesSuccess:
+
+```
+export function loadCoursesSuccess(courses) {
+  return {type: types.LOAD_COURSES_SUCCESS, courses};
+}
+```
+
+Lets talk for a moment about action naming conventions, we are using the SUCCESS suffix in LOAD_COURSES_SUCCESS for two reasons, fir swe already have a function called loadcourses, our thunk, second this action LOAD_COURSES_SUCCESS doesn't fire untill all courses have successfully returned by our api call so the suffix clarifies that our async request was successful, third people often create a corresponding failure action type called loadCoursesFailure or loadCoursesError, to save time we are not going to create corrsponding error and failure actions for each thunk, but you might want to do so in a real app when you need to treat the failures of different async calls uniquely, but for now we will just use a catch on our promise to handle errors.
+
+Now we can discuss how to handle loading courses in our reducer.
+
+Now that we have a loadCoursesSuccess action we need to create a corresponding handler in our src/reducers/courseReducer.js file, we will then modify the file as follows:
+
+```
+import objectAssign from 'object-assign';
+import * as types from '../actions/actionTypes';
+
+export default function courseReducer(state = [], action) {
+  switch (action.type) {
+    case types.LOAD_COURSES_SUCCESS:
+      return action.courses
+
+    default:
+      return state;
+  }
+}
+```
+
+so we removed the old action CREATE_COURSE and replaced it with types.LOAD_COURSES_SUCCESS.
+
+then we return action.courses which are the courses that are passed in on the action since whatever is returned from our API will simply replace what was in our state this is all we have to do.
+
+so where and how do we fire this off on load? to do that we can open our app's entry point src/index.js, in here you can see the call to configure the call to configureStore, once the store is configured we can go ahead and dispatch actions against the store, so let us add a reference up here to our action:
+
+```
+import {loadCourses} from './actions/courseActions';
+```
+
+since I have a reference to my store here:
+
+```
+const store = configureStore();
+```
+
+we can go ahead and use the dispatch function which is part of my store and then I can pass it the action that I'd like to dispatch, which in this case is loadCourses like this:
+
+```
+store.dispatch(loadCourses());
+```
+
+So our src/index.js file becomes:
+
+```
+// /* global System */ //this is for eslint to allow the use of System.import
+import indexhtml from './index.html';
+import talk from './talkToConsole';
+
+import 'babel-polyfill';
+import React from 'react';
+import {render} from 'react-dom';
+import {Router, browserHistory} from 'react-router';
+import routes from './routes';
+import configureStore from './store/configureStore';
+import {Provider} from 'react-redux';
+import {loadCourses} from './actions/courseActions';
+import './styles/style.css';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
+const store = configureStore();
+store.dispatch(loadCourses());
+
+render(
+  <Provider store={store}>
+    <Router history={browserHistory} routes={routes} />
+  </Provider>,
+  document.getElementById('app')
+);
+
+console.log(talk(1, 2));
+
+const button = document.createElement('button');
+button.innerText = 'Click Me To Display Images';
+button.onclick = () => {
+    System.import('./image_viewer').then(module => {
+        module.default();
+    });
+};
+
+document.body.appendChild(button);
+```
+
+and our src/components/course/CoursesPage.js becomes:
+
+```
+import React, {PropTypes} from 'react';
+import { connect } from 'react-redux';
+import * as courseActions from '../../actions/courseActions';
+import { bindActionCreators } from 'redux';
+
+class CoursesPage extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  courseRow(course, index) {
+    return <div key={index}>{course.title}</div>;
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Courses</h1>
+        {this.props.courses.map(this.courseRow)}
+      </div>
+    );
+  }
+}
+
+CoursesPage.propTypes = {
+  courses: PropTypes.array.isRequired,
+  actions: PropTypes.object.isRequired
+};
+
+function mapStateToProps(state, ownProps) {
+  return {
+    courses: state.courses
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(courseActions, dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+```
+
+And our src/actions/courseActions.js becomes:
+
+```
+import * as types from './actionTypes';
+import courseApi from '../api/mockCourseApi';
+
+export function loadCoursesSuccess(courses) {
+  return {type: types.LOAD_COURSES_SUCCESS, courses};
+}
+
+export function loadCourses() {
+  return function (dispatch) {
+    return courseApi.getAllCourses().then(courses => {
+      dispatch(loadCoursesSuccess(courses));
+    }).catch(error => {
+      throw(error);
+    });
+  };
+}
+```
+
+Now start the app.
