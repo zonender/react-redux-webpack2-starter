@@ -4156,3 +4156,42 @@ first lets remove the in line form in our src/components/course/CoursePage.js
 The lets remove the onTitleChange function and the onClickSave function and the corresponding binds in the constructor.
 
 And lets also remove the sate initialization "this.state" because this page will no longer be managing courses it is just going to show the list of courses, we will now have this page load a list of existing courses using the mock api, we will load the courses by by displaying an action with redux, and to make this happen we will use redux thunks.
+
+> **_//==============================================================\\_**
+>
+> **_Adding Thunk to Store_**
+>
+> **_\\==============================================================//_**
+
+We use thunk to handle AJAX calls to an API, add thunks we will update the store configuration in the src/store/configureStore.js, we will need to add thunk to our middleware:
+
+First we have to import it:
+
+```
+import thunk from 'redux-thunk';
+```
+
+Then we can just add it to the list of middleware in the applyMiddleware function like this:
+
+```
+applyMiddleware(thunk, reduxImmutableStateInvariant())
+```
+
+and the final version of our src/store/configureStore.js becomes:
+
+```
+import {createStore, applyMiddleware} from 'redux';
+import rootReducer from '../reducers';
+import reduxImmutableStateInvariant from 'redux-immutable-state-invariant';
+import thunk from 'redux-thunk';
+
+export default function configureStore(initialState) {
+  return createStore(
+    rootReducer,
+    initialState,
+    applyMiddleware(thunk, reduxImmutableStateInvariant())
+    );
+}
+```
+
+The same method can be used to apply as many peices of middleware as we want to the applyMiddleware function, other useful middleware can be found in the redux docmunetation that includes logging, scheduling actions, and sedn crash reports. 
