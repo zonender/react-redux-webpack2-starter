@@ -4232,7 +4232,7 @@ export function loadCourses() {
 
 this wrapper function will exist in every one of our thunks, now we are inside the body of our thunk, at this point it is logical to make our api call, getAllCourses returns a promise, if you open the src/api/mockCourseApi.js you will see that, then we will handle this promise using the keyword ".then", then we are expecting getAllCourses promise to return a list of courses, and then we will handle it here within an arrow function "courses => {}", since there is only one parameter for this arrow function we can omit the parentheses around "courses" so it is an anonymous function, then after this promise returns we are ready to dispatch an action creator, at this point we will dispatch something called loadCoursesSuccess and we will pass it a list of courses, the action creator loadCoursesSuccess doesn't exist yet, we will create it in a moment, then we added some error handling by adding .catch to the promise  then we will just throw the error, you can choose to create a dedicated action creator to handle errors, but for now we will just use a .catch on the promise.
 
-In other examples people will use a fetch call or an AJAX call, with this setup if we want to use a real api we just have to change the import at the top of the file.
+in our thunk we called a mock api here: "courseApi.getAllCourses()" in other examples people will use a fetch call or an AJAX call, either approaches are fine, with this setup if we want to use a real api we just have to change the import at the top of the file.
 
 Now lets create the loadCoursesSuccess action, we first have to create a new constant in the src/actions/actionTypes.js file:
 
@@ -4250,7 +4250,7 @@ export function loadCoursesSuccess(courses) {
 }
 ```
 
-Lets talk for a moment about action naming conventions, we are using the SUCCESS suffix in LOAD_COURSES_SUCCESS for two reasons, fir swe already have a function called loadcourses, our thunk, second this action LOAD_COURSES_SUCCESS doesn't fire untill all courses have successfully returned by our api call so the suffix clarifies that our async request was successful, third people often create a corresponding failure action type called loadCoursesFailure or loadCoursesError, to save time we are not going to create corrsponding error and failure actions for each thunk, but you might want to do so in a real app when you need to treat the failures of different async calls uniquely, but for now we will just use a catch on our promise to handle errors.
+Lets talk for a moment about action naming conventions, we are using the SUCCESS suffix in LOAD_COURSES_SUCCESS for two reasons, first we already have a function called loadcourses, our thunk, second this action LOAD_COURSES_SUCCESS doesn't fire untill all courses have successfully returned by our api call so the suffix clarifies that our async request was successful, third people often create a corresponding failure action type called loadCoursesFailure or loadCoursesError, to save time we are not going to create corrsponding error and failure actions for each thunk, but you might want to do so in a real app when you need to treat the failures of different async calls uniquely, but for now we will just use a catch on our promise to handle errors.
 
 Now we can discuss how to handle loading courses in our reducer.
 
@@ -4403,3 +4403,194 @@ export function loadCourses() {
 ```
 
 Now start the app.
+
+> **_//==============================================================\\_**
+>
+> **_Create Course List Component_**
+>
+> **_\\==============================================================//_**
+
+Our src/components/course/CoursesPage.js component is a container component so ideally it shouldn't contain any markup, so the markeup in it should be in a separate file called a presentation component, so we should remove the <div> tag under the render function:
+
+```
+  render() {
+    return (
+      <div>
+        <h1>Courses</h1>
+        {this.props.courses.map(this.courseRow)}
+      </div>
+    );
+  }
+```
+
+So let's create the file: src/components/course/CourseList.js and put this code in it and save it:
+
+```
+import React, {PropTypes} from 'react';
+import CourseListRow from './CourseListRow';
+
+const CourseList = ({courses}) => {
+  return (
+    <table className="table">
+      <thead>
+      <tr>
+        <th>&nbsp;</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Category</th>
+        <th>Length</th>
+      </tr>
+      </thead>
+      <tbody>
+      {courses.map(course =>
+        <CourseListRow key={course.id} course={course}/>
+      )}
+      </tbody>
+    </table>
+  );
+};
+
+CourseList.propTypes = {
+  courses: PropTypes.array.isRequired
+};
+
+export default CourseList;
+```
+
+Here we are importing a CourseListRow that we will create in a moment, it also contains a table with a header, then we are mapping in the course data here:
+
+```
+      {courses.map(course =>
+        <CourseListRow key={course.id} course={course}/>
+      )}
+```
+
+that is being sent in here at the top and passed in as a parameter:
+
+```
+const CourseList = ({courses}) => {
+```
+
+as you can see we ar mapping over the list of courses and then using a CourseListRow component to display the individual rows.
+
+Then we will create the file src/components/course/CourseListRow.js and put this code in it and save it:
+
+```
+import React, {PropTypes} from 'react';
+import {Link} from 'react-router';
+
+const CourseListRow = ({course}) => {
+  return (
+    <tr>
+      <td><a href={course.watchHref} target="_blank">Watch</a></td>
+      <td><Link to={'/course/' + course.id}>{course.title}</Link></td>
+      <td>{course.authorId}</td>
+      <td>{course.category}</td>
+      <td>{course.length}</td>
+    </tr>
+  );
+};
+
+CourseListRow.propTypes = {
+  course: PropTypes.object.isRequired
+};
+
+export default CourseListRow;
+```
+
+here we are also using destructuring to keep our prop calls short and simple here:
+
+```
+const CourseListRow = ({course}) => {
+```
+
+so we can say:
+
+```
+{course.watchHref}
+```
+
+and
+
+```
+{course.title}
+```
+
+etc.
+
+so here we are displayiong a single row of data.
+
+now that we have these new components let's put them to use, first we will have to import our CourseList componet in our CoursePage component:
+
+```
+import CourseList from './CourseList';
+```
+
+Then we in our render function we will again use destructuring to keep our calls short within our render function like this
+
+```
+  render() {
+    const {courses} = this.props;
+
+    return (
+      <div>
+        <h1>Courses</h1>
+        <CourseList courses={courses}/>
+      </div>
+    );
+  }
+```
+
+So the final version of our CoursePage.js becomes:
+
+```
+import React, {PropTypes} from 'react';
+import { connect } from 'react-redux';
+import * as courseActions from '../../actions/courseActions';
+import { bindActionCreators } from 'redux';
+import CourseList from './CourseList';
+
+class CoursesPage extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  courseRow(course, index) {
+    return <div key={index}>{course.title}</div>;
+  }
+
+  render() {
+    return {courses} = this.props;
+
+    return (
+      <div>
+        <h1>Courses</h1>
+        <CourseList courses={courses}/>
+      </div>
+    );
+  }
+}
+
+CoursesPage.propTypes = {
+  courses: PropTypes.array.isRequired,
+  actions: PropTypes.object.isRequired
+};
+
+function mapStateToProps(state, ownProps) {
+  return {
+    courses: state.courses
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(courseActions, dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+```
+
+
+
+
