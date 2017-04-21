@@ -38,6 +38,73 @@
 
 > **_//==============================================================\\_**
 >
+> **_Recent Bug Fixes And Issues_**
+>
+> **_\\==============================================================//_**
+
+* OS: Windows 10 (64-bit)
+
+  Under the images rule in the Images rule in the webpack.config.dev.js file:
+
+  Change the line 'image-webpack-loader' here:
+
+  ```
+    {
+      test: /\.(jpe?g|jpg|png|gif|svg)$/,
+      use: [
+        {
+          loader: 'url-loader'
+        },
+        'image-webpack-loader'
+      ]
+    },
+  ```
+
+  To include an empty options object:
+
+  ```
+  {
+    test: /\.(jpe?g|jpg|png|gif|svg)$/,
+    use: [
+      {
+        loader: 'url-loader'
+      },
+      {
+        loader: 'image-webpack-loader',
+        options: {}
+      }
+    ]
+  },
+  ```
+
+  Without the empty options object the code will produce the following error when running it in an Apple IOS machine:
+
+  ```
+  /index
+
+  ERROR in ./~/bootstrap/dist/fonts/glyphicons-halflings-regular.svg
+  Module build failed: TypeError: Cannot read property 'bypassOnDebug' of null
+      at Object.module.exports (/Users/abdelga/Desktop/react-redux-webpack2-starter/node_modules/image-webpack-loader/index.js:30
+  :26)
+  @ ./~/css-loader!./~/bootstrap/dist/css/bootstrap.min.css 6:3700-3752
+  @ ./~/bootstrap/dist/css/bootstrap.min.css
+  @ ./src/index.js
+  @ multi (webpack)-dev-server/client?http://localhost:8080 eventsource-polyfill webpack-hot-middleware/client?reload=true ./src
+  /index
+  ```
+
+
+
+
+
+
+
+
+
+
+
+> **_//==============================================================\\_**
+>
 > **_.GITIGNORE AND README.MD_**
 >
 > **_\\==============================================================//_**
@@ -1071,6 +1138,79 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
     }
     ```
 
+    ```
+    {
+      "root": true,
+      "extends": [
+        "eslint:recommended",
+        "plugin:import/errors",
+        "plugin:import/warnings"
+      ],
+      "plugins": [
+        "react"
+      ],
+      "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
+        "ecmaFeatures": {
+          "jsx": true
+        }
+      },
+      "env": {
+        "es6": true,
+        "browser": true,
+        "node": true,
+        "jquery": true,
+        "mocha": true
+      },
+      "rules": {
+        "quotes": 0,
+        "no-console": 1,
+        "no-debugger": 1,
+        "no-var": 1,
+        "semi": [1, "always"],
+        "no-trailing-spaces": 0,
+        "eol-last": 0,
+        "no-unused-vars": 0,
+        "no-underscore-dangle": 0,
+        "no-alert": 0,
+        "no-lone-blocks": 0,
+        "jsx-quotes": 1,
+        "react/display-name": [ 1, {"ignoreTranspilerName": false }],
+        "react/forbid-prop-types": [1, {"forbid": ["any"]}],
+        "react/jsx-boolean-value": 1,
+        "react/jsx-closing-bracket-location": 0,
+        "react/jsx-curly-spacing": 1,
+        "react/jsx-indent-props": 0,
+        "react/jsx-key": 1,
+        "react/jsx-max-props-per-line": 0,
+        "react/jsx-no-bind": 1,
+        "react/jsx-no-duplicate-props": 1,
+        "react/jsx-no-literals": 0,
+        "react/jsx-no-undef": 1,
+        "react/jsx-pascal-case": 1,
+        "react/jsx-sort-prop-types": 0,
+        "react/jsx-sort-props": 0,
+        "react/jsx-uses-react": 1,
+        "react/jsx-uses-vars": 1,
+        "react/no-danger": 1,
+        "react/no-did-mount-set-state": 1,
+        "react/no-did-update-set-state": 1,
+        "react/no-direct-mutation-state": 1,
+        "react/no-multi-comp": 1,
+        "react/no-set-state": 0,
+        "react/no-unknown-property": 1,
+        "react/prefer-es6-class": 1,
+        "react/prop-types": 1,
+        "react/react-in-jsx-scope": 1,
+        "react/require-extension": 1,
+        "react/self-closing-comp": 1,
+        "react/sort-comp": 1,
+        "react/wrap-multilines": 1
+      }
+    }
+    ```
+    
 01. ) Then write the following npm script:
 
     ```
@@ -1095,7 +1235,7 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
     ```
     "scripts": {
       "prestart": "babel-node buildScripts/startMessage.js",
-      "start": "npm-run-all --parallel security-check open:src",
+      "start": "npm-run-all --parallel security-check open:src lint:watch",
       "open:src": "babel-node buildScripts/srcServer.js",
       "security-check": "nsp check",
       "localtunnel": "lt --port 3000",
@@ -1106,8 +1246,6 @@ to a ".bin" folder inside the "node_modules" folder of our root, this makes them
       "lint:watch": "npm run lint -- --watch"
     },
     ```
-
-    make sure to disable any linting features your editor may have, otherwise you run the risk of overriding your linting rules with those of the editor's
 
 > **_//==============================================================\\_**
 >
@@ -4591,6 +4729,51 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
 ```
 
+> **_//==============================================================\\_**
+>
+> **_Adding and Editing Courses_**
+>
+> **_\\==============================================================//_**
 
+To be able to add and edit courses we need to create a dedicated page, so we need to create a new component called ManageCoursePage.js here is the boiler plate for the 
+component:
+
+```
+import React, {PropTypes} from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+class ManageCoursePage extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  render() {
+    return (
+      
+    );
+  }
+}
+
+ManageCoursePage.PropTypes = {
+  //
+}
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    state: state
+  };
+}
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    actions: bindActionCreators(courseActions, dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ManageCoursePage)
+```
+
+Let's 
 
 

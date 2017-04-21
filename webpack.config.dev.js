@@ -38,7 +38,10 @@ const config = {
           {
             loader: 'url-loader'
           },
-          'image-webpack-loader'
+          {
+            loader: 'image-webpack-loader',
+            options: {}
+          }
         ]
       },
       { test: /\.(png|woff|woff2|eot|ttf|svg)$/, use: 'url-loader?limit=100000' }
@@ -64,3 +67,5 @@ const config = {
 };
 
 module.exports = config;
+
+
