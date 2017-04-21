@@ -10,6 +10,7 @@ class ManageCoursePage extends React.Component {
 
   render() {
     return (
+      
     );
   }
 }
@@ -26,7 +27,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    actions: bindActionCreators(courseActions,dispatch)
+    actions: bindActionCreators(courseActions, dispatch)
   };
 }
 
