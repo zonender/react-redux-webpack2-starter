@@ -18,7 +18,20 @@
 
 * Editor: Visual Studio Code version 1.10.1
 
-* VS CODE File Icon theme: Go to the plugins side menu: type: vscode-icons, locate the plugin, install it, reload, then goto File > Preferences > select "File Icon Theme".
+* VS CODE File Icon theme: Go to the plugins side menu: type: vscode-icons, locate the plugin, install it, reload, then goto File > Preferences > select "File Icon Theme", then select "VSCode Icons".
+
+* To add Git Bash to the integrated terminal of Visual Studio Code IDE, first make sure Git Bash is installed, then add this line:
+
+  "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe"
+
+  To the C:\Users\[USER NAME]\AppData\Roaming\Code\User\settings.json file like this:
+
+  {
+    "workbench.iconTheme": "vscode-icons",
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe"
+  }
+
+  Then save the file.
 
 * Node version: 7.5.0
 
